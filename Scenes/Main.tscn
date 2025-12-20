@@ -1,192 +1,52 @@
-[gd_scene load_steps=33 format=3 uid="uid://cu115ovv1nkck"]
+[gd_scene load_steps=18 format=3 uid="uid://cu115ovv1nkck"]
 
 [ext_resource type="Script" uid="uid://bq60j16f3yk7c" path="res://Scripts/SlotMachine.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://cc5k5moj3w12" path="res://Assets/reelImages2.png" id="2_idj7w"]
-[ext_resource type="Texture2D" uid="uid://orange2_tex" path="res://Assets/Orange2.png" id="3_orange"]
+[ext_resource type="Texture2D" uid="uid://cbywfeq028she" path="res://assets.sprites/seven.tres" id="2_frkhe"]
+[ext_resource type="Texture2D" uid="uid://djmec8hjftikb" path="res://assets.sprites/2bar.tres" id="3_1p5hy"]
+[ext_resource type="Texture2D" uid="uid://dru1xc7x37boo" path="res://assets.sprites/3bar.tres" id="4_h1m7h"]
+[ext_resource type="Texture2D" uid="uid://bwghbg6kjeu3h" path="res://assets.sprites/bar.tres" id="5_erwvk"]
+[ext_resource type="Texture2D" uid="uid://uuu0t2h4k6lx" path="res://assets.sprites/Orange1.tres" id="6_2w5on"]
+[ext_resource type="Texture2D" uid="uid://da0n50jhot063" path="res://assets.sprites/Orange2.tres" id="7_346fj"]
+[ext_resource type="Texture2D" uid="uid://1klnh3q21tdq" path="res://assets.sprites/Orange3.tres" id="8_0sclb"]
+[ext_resource type="Texture2D" uid="uid://c3om161ua4phc" path="res://assets.sprites/Orange4.tres" id="9_sxkr1"]
+[ext_resource type="Texture2D" uid="uid://c6268g1cmewjt" path="res://assets.sprites/Orange5.tres" id="10_fq0cl"]
+[ext_resource type="Texture2D" uid="uid://dop8memb8p0sk" path="res://assets.sprites/Orange6.tres" id="11_hwpts"]
+[ext_resource type="Texture2D" uid="uid://bi0dn6qvu17s7" path="res://assets.sprites/Orange8.tres" id="12_jyqft"]
+[ext_resource type="Texture2D" uid="uid://bn0mv3gq2ok0v" path="res://assets.sprites/Orange7.tres" id="13_3tgeq"]
+[ext_resource type="Texture2D" path="res://assets.sprites/blue_seven.tres" id="14_blue7"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_kln2b"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(0, 0, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_rgh2o"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(253, 0, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_pbw6q"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(506, 0, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_v1gob"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(759, 0, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_jw32o"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(0, 251, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_50glp"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(253, 251, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_vy5pj"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(506, 251, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_bmxlf"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(759, 251, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_4kpch"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(0, 502, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_grg3l"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(253, 502, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_frkhe"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(506, 502, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_1p5hy"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(759, 502, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_h1m7h"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(0, 753, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_erwvk"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(253, 753, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_2w5on"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(506, 753, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_346fj"]
-atlas = ExtResource("2_idj7w")
-region = Rect2(759, 753, 253, 251)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_exp01"]
-atlas = ExtResource("3_orange")
-region = Rect2(0, 0, 250, 190)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_exp02"]
-atlas = ExtResource("3_orange")
-region = Rect2(250, 0, 250, 190)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_exp03"]
-atlas = ExtResource("3_orange")
-region = Rect2(500, 0, 250, 190)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_exp04"]
-atlas = ExtResource("3_orange")
-region = Rect2(750, 0, 250, 190)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_exp05"]
-atlas = ExtResource("3_orange")
-region = Rect2(0, 190, 250, 190)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_exp06"]
-atlas = ExtResource("3_orange")
-region = Rect2(250, 190, 250, 190)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_exp07"]
-atlas = ExtResource("3_orange")
-region = Rect2(500, 190, 250, 190)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_exp08"]
-atlas = ExtResource("3_orange")
-region = Rect2(750, 190, 250, 190)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_0sclb"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_kln2b")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_rgh2o")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_pbw6q")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_v1gob")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_jw32o")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_50glp")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_vy5pj")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_bmxlf")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_4kpch")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_grg3l")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_frkhe")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_1p5hy")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_h1m7h")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_erwvk")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_2w5on")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_346fj")
-}],
-"loop": true,
-"name": &"Spin1",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": true,
-"name": &"default",
-"speed": 5.0
-}]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_white"]
+bg_color = Color(1, 1, 1, 1)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_explosion"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_exp01")
+"texture": ExtResource("6_2w5on")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_exp02")
+"texture": ExtResource("7_346fj")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_exp03")
+"texture": ExtResource("8_0sclb")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_exp04")
+"texture": ExtResource("8_0sclb")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_exp05")
+"texture": ExtResource("9_sxkr1")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_exp06")
+"texture": ExtResource("10_fq0cl")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_exp07")
+"texture": ExtResource("11_hwpts")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_exp08")
+"texture": ExtResource("12_jyqft")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_3tgeq")
 }],
 "loop": false,
 "name": &"Explode",
@@ -200,25 +60,27 @@ position = Vector2(960, 540)
 script = ExtResource("1_script")
 
 [node name="Background" type="ColorRect" parent="SlotMachine"]
-offset_left = -400.0
-offset_top = -250.0
-offset_right = 400.0
-offset_bottom = 250.0
+offset_left = -420.0
+offset_top = -200.0
+offset_right = 420.0
+offset_bottom = 200.0
 color = Color(0.15, 0.1, 0.2, 1)
 
 [node name="ReelContainer" type="HBoxContainer" parent="SlotMachine"]
-offset_left = -300.0
+offset_left = -390.0
 offset_top = -150.0
-offset_right = 300.0
+offset_right = 390.0
 offset_bottom = 150.0
-theme_override_constants/separation = 20
+theme_override_constants/separation = 10
 
 [node name="Reel1" type="Panel" parent="SlotMachine/ReelContainer"]
-custom_minimum_size = Vector2(180, 300)
+custom_minimum_size = Vector2(200, 300)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_white")
 
-[node name="SymbolContainer" type="CenterContainer" parent="SlotMachine/ReelContainer/Reel1"]
+[node name="ClipContainer" type="Control" parent="SlotMachine/ReelContainer/Reel1"]
+clip_contents = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -226,33 +88,61 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Symbol" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/SymbolContainer"]
-custom_minimum_size = Vector2(65, 65)
+[node name="SymbolStrip" type="VBoxContainer" parent="SlotMachine/ReelContainer/Reel1/ClipContainer"]
+layout_mode = 1
+offset_right = 200.0
+offset_bottom = 1200.0
+theme_override_constants/separation = 40
+
+[node name="Symbol0" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
 layout_mode = 2
+texture = ExtResource("2_frkhe")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Node2D" type="Node2D" parent="SlotMachine/ReelContainer/Reel1/SymbolContainer"]
-scale = Vector2(0.75, 0.75)
+[node name="Symbol1" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("3_1p5hy")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="SlotMachine/ReelContainer/Reel1/SymbolContainer/Node2D"]
-position = Vector2(112.000015, 210.66667)
-sprite_frames = SubResource("SpriteFrames_0sclb")
-animation = &"Spin1"
-frame = 3
+[node name="Symbol2" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("4_h1m7h")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Explosion" type="AnimatedSprite2D" parent="SlotMachine/ReelContainer/Reel1/SymbolContainer/Node2D"]
+[node name="Symbol3" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("5_erwvk")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Symbol4" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("14_blue7")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Explosion" type="AnimatedSprite2D" parent="SlotMachine/ReelContainer/Reel1"]
 visible = false
-position = Vector2(112.0, 210.0)
+position = Vector2(100, 150)
 sprite_frames = SubResource("SpriteFrames_explosion")
 animation = &"Explode"
 
 [node name="Reel2" type="Panel" parent="SlotMachine/ReelContainer"]
-custom_minimum_size = Vector2(180, 300)
+custom_minimum_size = Vector2(200, 300)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_white")
 
-[node name="SymbolContainer" type="CenterContainer" parent="SlotMachine/ReelContainer/Reel2"]
+[node name="ClipContainer" type="Control" parent="SlotMachine/ReelContainer/Reel2"]
+clip_contents = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -260,33 +150,61 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Symbol" type="TextureRect" parent="SlotMachine/ReelContainer/Reel2/SymbolContainer"]
-custom_minimum_size = Vector2(65, 65)
+[node name="SymbolStrip" type="VBoxContainer" parent="SlotMachine/ReelContainer/Reel2/ClipContainer"]
+layout_mode = 1
+offset_right = 200.0
+offset_bottom = 1200.0
+theme_override_constants/separation = 40
+
+[node name="Symbol0" type="TextureRect" parent="SlotMachine/ReelContainer/Reel2/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
 layout_mode = 2
+texture = ExtResource("2_frkhe")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Node2D" type="Node2D" parent="SlotMachine/ReelContainer/Reel2/SymbolContainer/Symbol"]
-scale = Vector2(0.75, 0.75)
+[node name="Symbol1" type="TextureRect" parent="SlotMachine/ReelContainer/Reel2/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("3_1p5hy")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="SlotMachine/ReelContainer/Reel2/SymbolContainer/Symbol/Node2D"]
-position = Vector2(32.000008, 54.66667)
-sprite_frames = SubResource("SpriteFrames_0sclb")
-animation = &"Spin1"
-frame = 3
+[node name="Symbol2" type="TextureRect" parent="SlotMachine/ReelContainer/Reel2/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("4_h1m7h")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Explosion" type="AnimatedSprite2D" parent="SlotMachine/ReelContainer/Reel2/SymbolContainer/Symbol/Node2D"]
+[node name="Symbol3" type="TextureRect" parent="SlotMachine/ReelContainer/Reel2/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("5_erwvk")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Symbol4" type="TextureRect" parent="SlotMachine/ReelContainer/Reel2/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("14_blue7")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Explosion" type="AnimatedSprite2D" parent="SlotMachine/ReelContainer/Reel2"]
 visible = false
-position = Vector2(32.0, 54.0)
+position = Vector2(100, 150)
 sprite_frames = SubResource("SpriteFrames_explosion")
 animation = &"Explode"
 
 [node name="Reel3" type="Panel" parent="SlotMachine/ReelContainer"]
-custom_minimum_size = Vector2(180, 300)
+custom_minimum_size = Vector2(200, 300)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_white")
 
-[node name="SymbolContainer" type="CenterContainer" parent="SlotMachine/ReelContainer/Reel3"]
+[node name="ClipContainer" type="Control" parent="SlotMachine/ReelContainer/Reel3"]
+clip_contents = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -294,18 +212,50 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Node2D" type="Node2D" parent="SlotMachine/ReelContainer/Reel3/SymbolContainer"]
-scale = Vector2(0.75, 0.75)
+[node name="SymbolStrip" type="VBoxContainer" parent="SlotMachine/ReelContainer/Reel3/ClipContainer"]
+layout_mode = 1
+offset_right = 200.0
+offset_bottom = 1200.0
+theme_override_constants/separation = 40
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="SlotMachine/ReelContainer/Reel3/SymbolContainer/Node2D"]
-position = Vector2(137.33334, 213.33334)
-sprite_frames = SubResource("SpriteFrames_0sclb")
-animation = &"Spin1"
-frame = 3
+[node name="Symbol0" type="TextureRect" parent="SlotMachine/ReelContainer/Reel3/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("2_frkhe")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Explosion" type="AnimatedSprite2D" parent="SlotMachine/ReelContainer/Reel3/SymbolContainer/Node2D"]
+[node name="Symbol1" type="TextureRect" parent="SlotMachine/ReelContainer/Reel3/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("3_1p5hy")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Symbol2" type="TextureRect" parent="SlotMachine/ReelContainer/Reel3/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("4_h1m7h")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Symbol3" type="TextureRect" parent="SlotMachine/ReelContainer/Reel3/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("5_erwvk")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Symbol4" type="TextureRect" parent="SlotMachine/ReelContainer/Reel3/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("14_blue7")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Explosion" type="AnimatedSprite2D" parent="SlotMachine/ReelContainer/Reel3"]
 visible = false
-position = Vector2(137.0, 213.0)
+position = Vector2(100, 150)
 sprite_frames = SubResource("SpriteFrames_explosion")
 animation = &"Explode"
 
@@ -318,8 +268,8 @@ text = "SPIN"
 
 [node name="CreditsLabel" type="Label" parent="SlotMachine"]
 offset_left = -100.0
-offset_top = -230.0
+offset_top = -180.0
 offset_right = 100.0
-offset_bottom = -200.0
+offset_bottom = -150.0
 text = "Credits: 100"
 horizontal_alignment = 1

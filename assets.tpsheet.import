@@ -1,0 +1,16 @@
+[remap]
+
+importer="codeandweb.texturepacker_import_spritesheet"
+type="Resource"
+uid="uid://8dqvvajjw846"
+path="res://.godot/imported/assets.tpsheet-d76591bf175ee1473ecc2ca8c1d78f31.res"
+
+[deps]
+
+files=["res://assets.sprites/Orange2.tres", "res://assets.sprites/Orange3.tres", "res://assets.sprites/Orange1.tres", "res://assets.sprites/Diamond.tres", "res://assets.sprites/Orange4.tres", "res://assets.sprites/Orange7.tres", "res://assets.sprites/lemon.tres", "res://assets.sprites/coin.tres", "res://assets.sprites/Orange8.tres", "res://assets.sprites/Orange5.tres", "res://assets.sprites/Orange6.tres", "res://assets.sprites/bar.tres", "res://assets.sprites/2bar.tres", "res://assets.sprites/crown.tres", "res://assets.sprites/Cherry.tres", "res://assets.sprites/strawberry.tres", "res://assets.sprites/plum.tres", "res://assets.sprites/HorseShoe.tres", "res://assets.sprites/apple.tres", "res://assets.sprites/Peach.tres", "res://assets.sprites/star.tres", "res://assets.sprites/blue_seven.tres", "res://assets.sprites/3bar.tres", "res://assets.sprites/Grape.tres", "res://assets.sprites/seven.tres"]
+
+source_file="res://assets.tpsheet"
+dest_files=["res://.godot/imported/assets.tpsheet-d76591bf175ee1473ecc2ca8c1d78f31.res", "res://assets.sprites/Orange2.tres", "res://assets.sprites/Orange3.tres", "res://assets.sprites/Orange1.tres", "res://assets.sprites/Diamond.tres", "res://assets.sprites/Orange4.tres", "res://assets.sprites/Orange7.tres", "res://assets.sprites/lemon.tres", "res://assets.sprites/coin.tres", "res://assets.sprites/Orange8.tres", "res://assets.sprites/Orange5.tres", "res://assets.sprites/Orange6.tres", "res://assets.sprites/bar.tres", "res://assets.sprites/2bar.tres", "res://assets.sprites/crown.tres", "res://assets.sprites/Cherry.tres", "res://assets.sprites/strawberry.tres", "res://assets.sprites/plum.tres", "res://assets.sprites/HorseShoe.tres", "res://assets.sprites/apple.tres", "res://assets.sprites/Peach.tres", "res://assets.sprites/star.tres", "res://assets.sprites/blue_seven.tres", "res://assets.sprites/3bar.tres", "res://assets.sprites/Grape.tres", "res://assets.sprites/seven.tres"]
+
+[params]
+

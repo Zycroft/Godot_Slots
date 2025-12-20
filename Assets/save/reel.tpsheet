@@ -1,0 +1,33 @@
+{
+	"textures": [
+		{
+			"image": "reel.png",
+			"size": {
+				"w": 1014,
+				"h": 1006
+			},
+			"sprites": [
+				{
+					"filename": "reelImages2.png",
+					"region": {
+						"x": 1,
+						"y": 1,
+						"w": 1012,
+						"h": 1004
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "1.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:34ba80c82ddb09172ee312196496df48:f4c617c82ebc5db9a13dd4f27d057369:56b3cf0874fd127a80fe51ebde0731c5$"
+	}
+}

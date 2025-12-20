@@ -5,7 +5,25 @@
       "Bash(powershell -Command:*)",
       "Bash(identify:*)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo create:*)",
+      "Bash(\"/c/Program Files/Godot/Godot_v4.5.1-stable_win64_console.exe\" --headless --path \"c:/Users/zycro/OneDrive/Documents/Apps/_godot/Slots\" --export-release \"Web\" \"C:/Users/zycro/OneDrive/Documents/Apps/_godot/SlotsHtmlExport/index.html\")",
+      "Bash(gh api:*)",
+      "Bash(gh run view:*)",
+      "Bash(git push:*)",
+      "Bash(del \"c:\\\\Users\\\\zycro\\\\OneDrive\\\\Documents\\\\Apps\\\\_godot\\\\Slots\\\\roguelike_slots.gdextension\")",
+      "Bash(rm:*)",
+      "Bash(npm install)",
+      "Bash(ls:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)",
+      "Bash(node:*)",
+      "Bash(magick:*)",
+      "Bash(\"C:/Program Files/CodeAndWeb/TexturePacker/bin/TexturePacker.exe\" \"c:/Users/zycro/OneDrive/Documents/Apps/_godot/Slots/TexturePacker/assets.tps\")",
+      "Bash(taskkill:*)",
+      "Bash(git checkout:*)",
+      "Bash(python3 -c:*)"
     ]
   }
 }

@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "image-openai": {
+      "command": "npx",
+      "args": ["ts-node", "src/server.ts"],
+      "cwd": "c:/Users/zycro/mcp-image-openai",
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
+    },
+    "imagemagick": {
+      "command": "npx",
+      "args": ["ts-node", "src/server.ts"],
+      "cwd": "c:/Users/zycro/mcp-imagemagick"
+    },
+    "texturepacker": {
+      "command": "npx",
+      "args": ["ts-node", "src/server.ts"],
+      "cwd": "c:/Users/zycro/mcp-texturepacker"
+    }
+  }
+}
