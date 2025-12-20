@@ -13,6 +13,12 @@ extends Node2D
 @onready var spin_button: Button = $SpinButton
 @onready var credits_label: Label = $CreditsLabel
 
+# Audio players
+@onready var sfx_spin_start: AudioStreamPlayer = $SFX/SpinStart
+@onready var sfx_reel_spin: AudioStreamPlayer = $SFX/ReelSpin
+@onready var sfx_reel_stop: AudioStreamPlayer = $SFX/ReelStop
+@onready var sfx_slot_win: AudioStreamPlayer = $SFX/SlotWin
+
 # Symbol textures - loaded at runtime
 var symbol_textures: Array = []
 
@@ -107,6 +113,9 @@ func _stop_reel(reel_index: int):
 	reels_stopped[reel_index] = true
 	reel_speeds[reel_index] = 0
 
+	# Play reel stop sound
+	sfx_reel_stop.play()
+
 	# Snap to nearest symbol position
 	var symbol_index = int(round(reel_positions[reel_index] / SYMBOL_TOTAL_HEIGHT)) % NUM_SYMBOLS
 	reel_positions[reel_index] = symbol_index * SYMBOL_TOTAL_HEIGHT
@@ -141,12 +150,19 @@ func _on_spin_pressed():
 	for strip in reel_strips:
 		strip.visible = true
 
+	# Play spin start sound and looping reel spin
+	sfx_spin_start.play()
+	sfx_reel_spin.play()
+
 	# Start spinning - each reel at slightly different speed for variety
 	for i in range(3):
 		reel_speeds[i] = BASE_SPEED + randf_range(-200, 200)
 
 func _stop_spin():
 	is_spinning = false
+
+	# Stop the spinning sound
+	sfx_reel_spin.stop()
 
 	# Check for win (all same symbol)
 	if final_symbols[0] == WIN_SYMBOL and final_symbols[1] == WIN_SYMBOL and final_symbols[2] == WIN_SYMBOL:
@@ -159,6 +175,9 @@ func _stop_spin():
 func _play_explosion():
 	is_exploding = true
 	explosions_finished = 0
+
+	# Play win sound
+	sfx_slot_win.play()
 
 	# Hide the reel strips and show explosions
 	for strip in reel_strips:

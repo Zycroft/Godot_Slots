@@ -1,6 +1,10 @@
-[gd_scene load_steps=18 format=3 uid="uid://cu115ovv1nkck"]
+[gd_scene load_steps=22 format=3 uid="uid://cu115ovv1nkck"]
 
 [ext_resource type="Script" uid="uid://bq60j16f3yk7c" path="res://Scripts/SlotMachine.gd" id="1_script"]
+[ext_resource type="AudioStream" path="res://Audio/SFX/spin_start.mp3" id="audio_spin_start"]
+[ext_resource type="AudioStream" path="res://Audio/SFX/reel_spin.mp3" id="audio_reel_spin"]
+[ext_resource type="AudioStream" path="res://Audio/SFX/reel_stop.mp3" id="audio_reel_stop"]
+[ext_resource type="AudioStream" path="res://Audio/SFX/slot_win.mp3" id="audio_slot_win"]
 [ext_resource type="Texture2D" uid="uid://cbywfeq028she" path="res://assets.sprites/seven.tres" id="2_frkhe"]
 [ext_resource type="Texture2D" uid="uid://djmec8hjftikb" path="res://assets.sprites/2bar.tres" id="3_1p5hy"]
 [ext_resource type="Texture2D" uid="uid://dru1xc7x37boo" path="res://assets.sprites/3bar.tres" id="4_h1m7h"]
@@ -273,3 +277,17 @@ offset_right = 100.0
 offset_bottom = -150.0
 text = "Credits: 100"
 horizontal_alignment = 1
+
+[node name="SFX" type="Node" parent="SlotMachine"]
+
+[node name="SpinStart" type="AudioStreamPlayer" parent="SlotMachine/SFX"]
+stream = ExtResource("audio_spin_start")
+
+[node name="ReelSpin" type="AudioStreamPlayer" parent="SlotMachine/SFX"]
+stream = ExtResource("audio_reel_spin")
+
+[node name="ReelStop" type="AudioStreamPlayer" parent="SlotMachine/SFX"]
+stream = ExtResource("audio_reel_stop")
+
+[node name="SlotWin" type="AudioStreamPlayer" parent="SlotMachine/SFX"]
+stream = ExtResource("audio_slot_win")

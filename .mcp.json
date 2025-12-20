@@ -1,22 +1,33 @@
 {
   "mcpServers": {
+    "godot": {
+      "command": "node",
+      "args": ["${MCP_SERVERS_PATH}/godot-mcp/build/index.js"],
+      "env": {
+        "GODOT_PATH": "${GODOT_PATH}"
+      }
+    },
     "image-openai": {
-      "command": "npx",
-      "args": ["ts-node", "src/server.ts"],
-      "cwd": "c:/Users/zycro/mcp-image-openai",
+      "command": "node",
+      "args": ["${MCP_SERVERS_PATH}/mcp-image-openai/dist/server.js"],
       "env": {
         "OPENAI_API_KEY": "${OPENAI_API_KEY}"
       }
     },
     "imagemagick": {
-      "command": "npx",
-      "args": ["ts-node", "src/server.ts"],
-      "cwd": "c:/Users/zycro/mcp-imagemagick"
+      "command": "node",
+      "args": ["${MCP_SERVERS_PATH}/mcp-imagemagick/dist/server.js"]
     },
     "texturepacker": {
-      "command": "npx",
-      "args": ["ts-node", "src/server.ts"],
-      "cwd": "c:/Users/zycro/mcp-texturepacker"
+      "command": "node",
+      "args": ["${MCP_SERVERS_PATH}/mcp-texturepacker/dist/server.js"]
+    },
+    "audio-elevenlabs": {
+      "command": "node",
+      "args": ["${MCP_SERVERS_PATH}/mcp-audio-elevenlabs/dist/server.js"],
+      "env": {
+        "ELEVENLABS_API_KEY": "${ELEVENLABS_API_KEY}"
+      }
     }
   }
 }
