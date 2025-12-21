@@ -18,6 +18,7 @@
 [ext_resource type="AudioStream" path="res://Audio/SFX/reel_stop.mp3" id="audio_reel_stop"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/slot_win.mp3" id="audio_slot_win"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/spin_start.mp3" id="audio_spin_start"]
+[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/casino_marker_bg.png" id="marker_bg"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_white"]
 bg_color = Color(1, 1, 1, 1)
@@ -293,19 +294,45 @@ stream = ExtResource("audio_reel_stop")
 stream = ExtResource("audio_slot_win")
 
 [node name="HUD" type="CanvasLayer" parent="."]
+follow_viewport_enabled = true
 
-[node name="MarkerPanel" type="VBoxContainer" parent="HUD"]
+[node name="Marker" type="Control" parent="HUD"]
 offset_left = 20.0
 offset_top = 20.0
-offset_right = 300.0
-offset_bottom = 100.0
+offset_right = 280.0
+offset_bottom = 180.0
 
-[node name="MarkerLabel" type="Label" parent="HUD/MarkerPanel"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Marker: $10,000"
+[node name="Background" type="TextureRect" parent="HUD/Marker"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("marker_bg")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="DueLabel" type="Label" parent="HUD/MarkerPanel"]
+[node name="Labels" type="VBoxContainer" parent="HUD/Marker"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 60.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarkerLabel" type="Label" parent="HUD/Marker/Labels"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "Due in: 24 Hours"
+theme_override_font_sizes/font_size = 24
+text = "$10,000"
+horizontal_alignment = 1
+
+[node name="DueLabel" type="Label" parent="HUD/Marker/Labels"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Due: 24 Hours"
+horizontal_alignment = 1
