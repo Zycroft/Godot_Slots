@@ -4,29 +4,14 @@
       "command": "node",
       "args": ["${MCP_SERVERS_PATH}/godot-mcp/build/index.js"],
       "env": {
-        "GODOT_PATH": "${GODOT_PATH}"
+        "GODOT_PATH": "C:/Users/parke/OneDrive/Repos/Godot_v4.5.1-stable_win64.exe/Godot_v4.5.1-stable_win64.exe"
       }
     },
     "image-openai": {
       "command": "node",
-      "args": ["${MCP_SERVERS_PATH}/mcp-image-openai/dist/server.js"],
+      "args": ["${MCP_SERVERS_PATH}/mcp-image-openai/dist/index.js"],
       "env": {
         "OPENAI_API_KEY": "${OPENAI_API_KEY}"
-      }
-    },
-    "imagemagick": {
-      "command": "node",
-      "args": ["${MCP_SERVERS_PATH}/mcp-imagemagick/dist/server.js"]
-    },
-    "texturepacker": {
-      "command": "node",
-      "args": ["${MCP_SERVERS_PATH}/mcp-texturepacker/dist/server.js"]
-    },
-    "audio-elevenlabs": {
-      "command": "node",
-      "args": ["${MCP_SERVERS_PATH}/mcp-audio-elevenlabs/dist/server.js"],
-      "env": {
-        "ELEVENLABS_API_KEY": "${ELEVENLABS_API_KEY}"
       }
     }
   }
