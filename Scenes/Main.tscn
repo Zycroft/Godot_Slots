@@ -1,23 +1,23 @@
-[gd_scene load_steps=22 format=3 uid="uid://cu115ovv1nkck"]
+[gd_scene load_steps=21 format=3]
 
-[ext_resource type="Script" uid="uid://bq60j16f3yk7c" path="res://Scripts/SlotMachine.gd" id="1_script"]
-[ext_resource type="AudioStream" path="res://Audio/SFX/spin_start.mp3" id="audio_spin_start"]
+[ext_resource type="Script" path="res://Scripts/SlotMachine.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets.sprites/seven.tres" id="2_frkhe"]
+[ext_resource type="Texture2D" path="res://assets.sprites/2bar.tres" id="3_1p5hy"]
+[ext_resource type="Texture2D" path="res://assets.sprites/3bar.tres" id="4_h1m7h"]
+[ext_resource type="Texture2D" path="res://assets.sprites/bar.tres" id="5_erwvk"]
+[ext_resource type="Texture2D" path="res://assets.sprites/Orange1.tres" id="6_2w5on"]
+[ext_resource type="Texture2D" path="res://assets.sprites/Orange2.tres" id="7_346fj"]
+[ext_resource type="Texture2D" path="res://assets.sprites/Orange3.tres" id="8_0sclb"]
+[ext_resource type="Texture2D" path="res://assets.sprites/Orange4.tres" id="9_sxkr1"]
+[ext_resource type="Texture2D" path="res://assets.sprites/Orange5.tres" id="10_fq0cl"]
+[ext_resource type="Texture2D" path="res://assets.sprites/Orange6.tres" id="11_hwpts"]
+[ext_resource type="Texture2D" path="res://assets.sprites/Orange8.tres" id="12_jyqft"]
+[ext_resource type="Texture2D" path="res://assets.sprites/Orange7.tres" id="13_3tgeq"]
+[ext_resource type="Texture2D" path="res://assets.sprites/blue_seven.tres" id="14_blue7"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/reel_spin.mp3" id="audio_reel_spin"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/reel_stop.mp3" id="audio_reel_stop"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/slot_win.mp3" id="audio_slot_win"]
-[ext_resource type="Texture2D" uid="uid://cbywfeq028she" path="res://assets.sprites/seven.tres" id="2_frkhe"]
-[ext_resource type="Texture2D" uid="uid://djmec8hjftikb" path="res://assets.sprites/2bar.tres" id="3_1p5hy"]
-[ext_resource type="Texture2D" uid="uid://dru1xc7x37boo" path="res://assets.sprites/3bar.tres" id="4_h1m7h"]
-[ext_resource type="Texture2D" uid="uid://bwghbg6kjeu3h" path="res://assets.sprites/bar.tres" id="5_erwvk"]
-[ext_resource type="Texture2D" uid="uid://uuu0t2h4k6lx" path="res://assets.sprites/Orange1.tres" id="6_2w5on"]
-[ext_resource type="Texture2D" uid="uid://da0n50jhot063" path="res://assets.sprites/Orange2.tres" id="7_346fj"]
-[ext_resource type="Texture2D" uid="uid://1klnh3q21tdq" path="res://assets.sprites/Orange3.tres" id="8_0sclb"]
-[ext_resource type="Texture2D" uid="uid://c3om161ua4phc" path="res://assets.sprites/Orange4.tres" id="9_sxkr1"]
-[ext_resource type="Texture2D" uid="uid://c6268g1cmewjt" path="res://assets.sprites/Orange5.tres" id="10_fq0cl"]
-[ext_resource type="Texture2D" uid="uid://dop8memb8p0sk" path="res://assets.sprites/Orange6.tres" id="11_hwpts"]
-[ext_resource type="Texture2D" uid="uid://bi0dn6qvu17s7" path="res://assets.sprites/Orange8.tres" id="12_jyqft"]
-[ext_resource type="Texture2D" uid="uid://bn0mv3gq2ok0v" path="res://assets.sprites/Orange7.tres" id="13_3tgeq"]
-[ext_resource type="Texture2D" path="res://assets.sprites/blue_seven.tres" id="14_blue7"]
+[ext_resource type="AudioStream" path="res://Audio/SFX/spin_start.mp3" id="audio_spin_start"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_white"]
 bg_color = Color(1, 1, 1, 1)
@@ -291,3 +291,21 @@ stream = ExtResource("audio_reel_stop")
 
 [node name="SlotWin" type="AudioStreamPlayer" parent="SlotMachine/SFX"]
 stream = ExtResource("audio_slot_win")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="MarkerPanel" type="VBoxContainer" parent="HUD"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 300.0
+offset_bottom = 100.0
+
+[node name="MarkerLabel" type="Label" parent="HUD/MarkerPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Marker: $10,000"
+
+[node name="DueLabel" type="Label" parent="HUD/MarkerPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Due in: 24 Hours"
