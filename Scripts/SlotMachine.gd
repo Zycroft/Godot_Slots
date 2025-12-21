@@ -12,6 +12,7 @@ extends Node2D
 
 @onready var spin_button: Button = $SpinButton
 @onready var credits_label: Label = $CreditsLabel
+@onready var lever: TextureButton = $Lever
 
 # HUD labels
 @onready var amount_label: Label = $"../HUD/Marker/AmountLabel"
@@ -59,8 +60,14 @@ const WIN_SYMBOL = 3
 var is_exploding: bool = false
 var explosions_finished: int = 0
 
+# Lever state
+var lever_start_pos: Vector2
+var is_lever_pulling: bool = false
+
 func _ready():
 	spin_button.pressed.connect(_on_spin_pressed)
+	lever.pressed.connect(_on_lever_pressed)
+	lever_start_pos = lever.position
 
 	# Connect explosion animation finished signals
 	explosion1.animation_finished.connect(_on_explosion_finished)
@@ -153,6 +160,7 @@ func _on_spin_pressed():
 	spin_time = 0.0
 	reels_stopped = [false, false, false]
 	spin_button.disabled = true
+	lever.disabled = true
 
 	# Hide explosions and show reel strips
 	explosion1.visible = false
@@ -183,6 +191,7 @@ func _stop_spin():
 		_update_credits_display()
 	else:
 		spin_button.disabled = false
+		lever.disabled = false
 
 func _play_explosion():
 	is_exploding = true
@@ -216,6 +225,7 @@ func _on_explosion_finished():
 		explosions_finished = 0
 		is_exploding = false
 		spin_button.disabled = false
+		lever.disabled = false
 
 func _update_credits_display():
 	credits_label.text = "Credits: " + str(credits)
@@ -223,3 +233,25 @@ func _update_credits_display():
 func _update_hud():
 	amount_label.text = "$" + str(credits)
 	due_label.text = str(int(hours_remaining))
+
+func _on_lever_pressed():
+	if is_spinning or is_exploding or is_lever_pulling or credits < SPIN_COST or hours_remaining < HOURS_PER_SPIN:
+		return
+
+	is_lever_pulling = true
+	lever.disabled = true
+
+	# Animate lever pull down
+	var tween = create_tween()
+	tween.tween_property(lever, "position:y", lever_start_pos.y + 100, 0.15).set_ease(Tween.EASE_OUT)
+	tween.tween_callback(_start_spin_from_lever)
+	tween.tween_property(lever, "position:y", lever_start_pos.y, 0.3).set_ease(Tween.EASE_OUT).set_delay(0.1)
+	tween.tween_callback(_on_lever_reset)
+
+func _start_spin_from_lever():
+	_on_spin_pressed()
+
+func _on_lever_reset():
+	is_lever_pulling = false
+	if not is_spinning and not is_exploding:
+		lever.disabled = false

@@ -1,6 +1,7 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://Scripts/SlotMachine.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/slot_lever.png" id="lever_texture"]
 [ext_resource type="Texture2D" path="res://assets.sprites/seven.tres" id="2_frkhe"]
 [ext_resource type="Texture2D" path="res://assets.sprites/2bar.tres" id="3_1p5hy"]
 [ext_resource type="Texture2D" path="res://assets.sprites/3bar.tres" id="4_h1m7h"]
@@ -59,6 +60,13 @@ animations = [{
 }]
 
 [node name="Main" type="Node2D"]
+
+[node name="SceneBackground" type="ColorRect" parent="."]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0.94, 0.92, 0.84, 1)
 
 [node name="SlotMachine" type="Node2D" parent="."]
 position = Vector2(960, 540)
@@ -265,13 +273,21 @@ sprite_frames = SubResource("SpriteFrames_explosion")
 animation = &"Explode"
 
 [node name="SpinButton" type="Button" parent="SlotMachine"]
+visible = false
 offset_left = -75.0
 offset_top = 180.0
 offset_right = 75.0
 offset_bottom = 220.0
 text = "SPIN"
 
+[node name="Lever" type="TextureButton" parent="SlotMachine"]
+position = Vector2(450, -100)
+scale = Vector2(0.5, 0.5)
+texture_normal = ExtResource("lever_texture")
+stretch_mode = 0
+
 [node name="CreditsLabel" type="Label" parent="SlotMachine"]
+visible = false
 offset_left = -100.0
 offset_top = -180.0
 offset_right = 100.0
