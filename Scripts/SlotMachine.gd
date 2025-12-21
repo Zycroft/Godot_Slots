@@ -13,6 +13,10 @@ extends Node2D
 @onready var spin_button: Button = $SpinButton
 @onready var credits_label: Label = $CreditsLabel
 
+# HUD labels
+@onready var amount_label: Label = $"../HUD/Marker/AmountLabel"
+@onready var due_label: Label = $"../HUD/Marker/DueLabel"
+
 # Audio players
 @onready var sfx_spin_start: AudioStreamPlayer = $SFX/SpinStart
 @onready var sfx_reel_spin: AudioStreamPlayer = $SFX/ReelSpin
@@ -31,6 +35,9 @@ const VISIBLE_OFFSET: float = 50.0  # Offset to center symbol in view
 
 # Spin state
 var credits: int = 100
+var hours_remaining: float = 8.0
+const HOURS_PER_SPIN: float = 0.5
+const SPIN_COST: int = 1
 var is_spinning: bool = false
 var spin_time: float = 0.0
 var spin_duration: float = 2.5
@@ -72,6 +79,9 @@ func _ready():
 		var start_symbol = randi() % NUM_SYMBOLS
 		reel_positions[i] = start_symbol * SYMBOL_TOTAL_HEIGHT
 		_update_reel_position(i)
+
+	# Initialize HUD
+	_update_hud()
 
 func _process(delta):
 	if is_spinning:
@@ -131,11 +141,13 @@ func _update_reel_position(reel_index: int):
 	strip.position.y = reel_positions[reel_index] - total_strip_height + VISIBLE_OFFSET
 
 func _on_spin_pressed():
-	if is_spinning or is_exploding or credits <= 0:
+	if is_spinning or is_exploding or credits < SPIN_COST or hours_remaining < HOURS_PER_SPIN:
 		return
 
-	credits -= 1
+	credits -= SPIN_COST
+	hours_remaining -= HOURS_PER_SPIN
 	_update_credits_display()
+	_update_hud()
 
 	is_spinning = true
 	spin_time = 0.0
@@ -207,3 +219,7 @@ func _on_explosion_finished():
 
 func _update_credits_display():
 	credits_label.text = "Credits: " + str(credits)
+
+func _update_hud():
+	amount_label.text = "$" + str(credits)
+	due_label.text = str(int(hours_remaining))
