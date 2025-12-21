@@ -23,7 +23,20 @@
       "Bash(\"C:/Program Files/CodeAndWeb/TexturePacker/bin/TexturePacker.exe\" \"c:/Users/zycro/OneDrive/Documents/Apps/_godot/Slots/TexturePacker/assets.tps\")",
       "Bash(taskkill:*)",
       "Bash(git checkout:*)",
-      "Bash(python3 -c:*)"
+      "Bash(python3 -c:*)",
+      "Bash(cat:*)",
+      "Bash(echo:*)",
+      "Bash(for dir in \"c:/Users/zycro/mcp-servers/\"*/)",
+      "Bash(do echo \"=== $dir ===\")",
+      "Bash(if [ -d \"$dir.git\" ])",
+      "Bash(then cd \"$dir\")",
+      "Bash(else echo \"No git repo\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(gh repo add-collaborator:*)",
+      "Bash(git branch:*)",
+      "Bash(git pull:*)",
+      "Bash(gh pr create --title \"Add responsive design with aspect ratio preservation\" --body \"$\\(cat <<''EOF''\n## Summary\n- Changed stretch mode from `viewport` to `canvas_items` for smoother scaling\n- Added `keep` aspect ratio to maintain 16:9 while filling the viewport\n- Scene now properly scales on different screen sizes with letterboxing\n\n## Test plan\n- [ ] Run the game and resize the window\n- [ ] Verify the game maintains 16:9 aspect ratio\n- [ ] Verify letterboxing appears on non-16:9 displays\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\nEOF\n\\)\")"
     ]
   }
 }
