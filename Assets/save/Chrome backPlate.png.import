@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://rn6uk1vspywq"
-path="res://.godot/imported/cherry.png-23c911f340c3c7fe3d5b4141bf52b4ae.ctex"
+uid="uid://dcdw3if161qav"
+path="res://.godot/imported/Chrome backPlate.png-0edf9261ab4ece54adaa950ad2e0b120.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/SingleImages/output/cherry.png"
-dest_files=["res://.godot/imported/cherry.png-23c911f340c3c7fe3d5b4141bf52b4ae.ctex"]
+source_file="res://Assets/save/Chrome backPlate.png"
+dest_files=["res://.godot/imported/Chrome backPlate.png-0edf9261ab4ece54adaa950ad2e0b120.ctex"]
 
 [params]
 

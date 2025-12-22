@@ -1,7 +1,0 @@
-[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://djhu7dx463ika"]
-
-[ext_resource type="Texture2D" uid="uid://jla5cdpat7l5" path="res://Assets/save/reel.png" id="1_pmlxa"]
-
-[resource]
-atlas = ExtResource("1_pmlxa")
-region = Rect2(1, 1, 1012, 1004)

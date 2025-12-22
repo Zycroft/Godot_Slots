@@ -4,5 +4,4 @@
 
 [resource]
 atlas = ExtResource("1_jhtmf")
-region = Rect2(1062, 1, 215, 165)
-margin = Rect2(20, 45, 41, 91)
+region = Rect2(775, 1543, 256, 256)

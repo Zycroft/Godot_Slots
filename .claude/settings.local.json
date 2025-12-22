@@ -36,7 +36,19 @@
       "Bash(gh repo add-collaborator:*)",
       "Bash(git branch:*)",
       "Bash(git pull:*)",
-      "Bash(gh pr create --title \"Add responsive design with aspect ratio preservation\" --body \"$\\(cat <<''EOF''\n## Summary\n- Changed stretch mode from `viewport` to `canvas_items` for smoother scaling\n- Added `keep` aspect ratio to maintain 16:9 while filling the viewport\n- Scene now properly scales on different screen sizes with letterboxing\n\n## Test plan\n- [ ] Run the game and resize the window\n- [ ] Verify the game maintains 16:9 aspect ratio\n- [ ] Verify letterboxing appears on non-16:9 displays\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\nEOF\n\\)\")"
+      "Bash(gh pr create --title \"Add responsive design with aspect ratio preservation\" --body \"$\\(cat <<''EOF''\n## Summary\n- Changed stretch mode from `viewport` to `canvas_items` for smoother scaling\n- Added `keep` aspect ratio to maintain 16:9 while filling the viewport\n- Scene now properly scales on different screen sizes with letterboxing\n\n## Test plan\n- [ ] Run the game and resize the window\n- [ ] Verify the game maintains 16:9 aspect ratio\n- [ ] Verify letterboxing appears on non-16:9 displays\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\nEOF\n\\)\")",
+      "Bash(git rebase:*)",
+      "Bash(git stash:*)",
+      "Bash(git log:*)",
+      "Bash(gh pr create --title \"Add basic game mechanics with credits and time system\" --body \"$\\(cat <<''EOF''\n## Summary\n- Added HUD with casino marker showing player credits and remaining hours\n- Player starts with $100 credits and 8 hours\n- Each spin costs $1 and takes 0.5 hours\n- Marker positioned in top-left corner with pixel art background\n- Game prevents spinning when out of credits or time\n\n## Test plan\n- [ ] Run the game and verify HUD shows $100 and 8 hours\n- [ ] Spin the reels and verify credits decrease by $1 and hours by 0.5\n- [ ] Verify game stops allowing spins when credits or hours run out\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\nEOF\n\\)\")",
+      "Bash(gh pr merge:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr create --title \"Add slot machine lever with pull animation\" --body \"$\\(cat <<''EOF''\n## Summary\n- Added red ball handle lever on right side of reels that triggers spin when clicked\n- Lever animates down when pulled and springs back up\n- Made lever and casino marker images transparent\n- Added eggshell background color to scene\n- Hidden spin button and credits label \\(using HUD marker instead\\)\n\n## Test plan\n- [ ] Run the game and click on the lever\n- [ ] Verify the lever animates down and triggers the spin\n- [ ] Verify the lever and marker have transparent backgrounds\n- [ ] Verify eggshell background is visible behind all elements\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\nEOF\n\\)\")",
+      "Bash(git fetch:*)",
+      "Bash(mkdir:*)",
+      "Bash(\"C:/Program Files/CodeAndWeb/TexturePacker/bin/TexturePacker.exe\" \"c:/Users/zycro/OneDrive/Documents/Apps/_godot/Slots/TexturePacker/assets.tps\" --force-publish)",
+      "Bash(\"C:/Program Files/CodeAndWeb/TexturePacker/bin/TexturePacker.exe\" \"c:/Users/zycro/OneDrive/Documents/Apps/_godot/Slots/TexturePacker/assets.tps\" --force-publish --trim-mode None)",
+      "Bash(\"C:/Program Files/CodeAndWeb/TexturePacker/bin/TexturePacker.exe\" \"c:/Users/zycro/OneDrive/Documents/Apps/_godot/Slots/TexturePacker/assets.tps\" --force-publish --trim-mode None --max-size 4096)"
     ]
   }
 }
