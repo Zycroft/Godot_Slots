@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://rn6uk1vspywq"
-path="res://.godot/imported/cherry.png-23c911f340c3c7fe3d5b4141bf52b4ae.ctex"
+uid="uid://dqy62fbkh4puu"
+path="res://.godot/imported/casinonote.png-bd6ded681be19d9efa464d7a8594ce1b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/SingleImages/output/cherry.png"
-dest_files=["res://.godot/imported/cherry.png-23c911f340c3c7fe3d5b4141bf52b4ae.ctex"]
+source_file="res://Assets/save/casinonote.png"
+dest_files=["res://.godot/imported/casinonote.png-bd6ded681be19d9efa464d7a8594ce1b.ctex"]
 
 [params]
 

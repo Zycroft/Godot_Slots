@@ -1,63 +1,26 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://Scripts/SlotMachine.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/slot_lever.png" id="lever_texture"]
-[ext_resource type="Texture2D" path="res://assets.sprites/seven.tres" id="2_frkhe"]
-[ext_resource type="Texture2D" path="res://assets.sprites/2bar.tres" id="3_1p5hy"]
-[ext_resource type="Texture2D" path="res://assets.sprites/3bar.tres" id="4_h1m7h"]
-[ext_resource type="Texture2D" path="res://assets.sprites/bar.tres" id="5_erwvk"]
-[ext_resource type="Texture2D" path="res://assets.sprites/Orange1.tres" id="6_2w5on"]
-[ext_resource type="Texture2D" path="res://assets.sprites/Orange2.tres" id="7_346fj"]
-[ext_resource type="Texture2D" path="res://assets.sprites/Orange3.tres" id="8_0sclb"]
-[ext_resource type="Texture2D" path="res://assets.sprites/Orange4.tres" id="9_sxkr1"]
-[ext_resource type="Texture2D" path="res://assets.sprites/Orange5.tres" id="10_fq0cl"]
-[ext_resource type="Texture2D" path="res://assets.sprites/Orange6.tres" id="11_hwpts"]
-[ext_resource type="Texture2D" path="res://assets.sprites/Orange8.tres" id="12_jyqft"]
-[ext_resource type="Texture2D" path="res://assets.sprites/Orange7.tres" id="13_3tgeq"]
-[ext_resource type="Texture2D" path="res://assets.sprites/blue_seven.tres" id="14_blue7"]
+[ext_resource type="Script" path="res://Scripts/GridOverlay.gd" id="grid_overlay_script"]
+[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/lever_spritesheet2_pixel.png" id="lever_spritesheet"]
+[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/cherry.png" id="cherry_texture"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/reel_spin.mp3" id="audio_reel_spin"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/reel_stop.mp3" id="audio_reel_stop"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/slot_win.mp3" id="audio_slot_win"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/spin_start.mp3" id="audio_spin_start"]
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/casino_marker_bg.png" id="marker_bg"]
+[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/BackPlateBrass.png" id="backplate_brass"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_white"]
 bg_color = Color(1, 1, 1, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 0, 1)
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_explosion"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("6_2w5on")
-}, {
-"duration": 1.0,
-"texture": ExtResource("7_346fj")
-}, {
-"duration": 1.0,
-"texture": ExtResource("8_0sclb")
-}, {
-"duration": 1.0,
-"texture": ExtResource("8_0sclb")
-}, {
-"duration": 1.0,
-"texture": ExtResource("9_sxkr1")
-}, {
-"duration": 1.0,
-"texture": ExtResource("10_fq0cl")
-}, {
-"duration": 1.0,
-"texture": ExtResource("11_hwpts")
-}, {
-"duration": 1.0,
-"texture": ExtResource("12_jyqft")
-}, {
-"duration": 1.0,
-"texture": ExtResource("13_3tgeq")
-}],
-"loop": false,
-"name": &"Explode",
-"speed": 6.0
-}]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lever"]
+size = Vector2(39, 131)
 
 [node name="Main" type="Node2D"]
 
@@ -72,22 +35,22 @@ color = Color(0.94, 0.92, 0.84, 1)
 position = Vector2(960, 540)
 script = ExtResource("1_script")
 
-[node name="Background" type="ColorRect" parent="SlotMachine"]
-offset_left = -420.0
-offset_top = -200.0
-offset_right = 420.0
-offset_bottom = 200.0
-color = Color(0.15, 0.1, 0.2, 1)
+[node name="ReelBackground" type="ColorRect" parent="SlotMachine"]
+offset_left = -452.0
+offset_top = -195.0
+offset_right = 452.0
+offset_bottom = 195.0
+color = Color(0.15, 0.15, 0.15, 1)
 
 [node name="ReelContainer" type="HBoxContainer" parent="SlotMachine"]
-offset_left = -390.0
-offset_top = -150.0
-offset_right = 390.0
-offset_bottom = 150.0
-theme_override_constants/separation = 10
+offset_left = -422.0
+offset_top = -165.0
+offset_right = 422.0
+offset_bottom = 165.0
+theme_override_constants/separation = 30
 
 [node name="Reel1" type="Panel" parent="SlotMachine/ReelContainer"]
-custom_minimum_size = Vector2(200, 300)
+custom_minimum_size = Vector2(256, 300)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_white")
@@ -103,174 +66,40 @@ grow_vertical = 2
 
 [node name="SymbolStrip" type="VBoxContainer" parent="SlotMachine/ReelContainer/Reel1/ClipContainer"]
 layout_mode = 1
-offset_right = 200.0
-offset_bottom = 1200.0
+offset_right = 256.0
+offset_bottom = 700.0
 theme_override_constants/separation = 40
 
 [node name="Symbol0" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-texture = ExtResource("2_frkhe")
+texture = ExtResource("cherry_texture")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="Symbol1" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-texture = ExtResource("3_1p5hy")
+texture = ExtResource("cherry_texture")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="Symbol2" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-texture = ExtResource("4_h1m7h")
+texture = ExtResource("cherry_texture")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Symbol3" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-texture = ExtResource("5_erwvk")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Symbol4" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-texture = ExtResource("14_blue7")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Explosion" type="AnimatedSprite2D" parent="SlotMachine/ReelContainer/Reel1"]
-visible = false
-position = Vector2(100, 150)
-sprite_frames = SubResource("SpriteFrames_explosion")
-animation = &"Explode"
-
-[node name="Reel2" type="Panel" parent="SlotMachine/ReelContainer"]
-custom_minimum_size = Vector2(200, 300)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_white")
-
-[node name="ClipContainer" type="Control" parent="SlotMachine/ReelContainer/Reel2"]
-clip_contents = true
+[node name="GridOverlay" type="Control" parent="SlotMachine/ReelContainer/Reel1"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="SymbolStrip" type="VBoxContainer" parent="SlotMachine/ReelContainer/Reel2/ClipContainer"]
-layout_mode = 1
-offset_right = 200.0
-offset_bottom = 1200.0
-theme_override_constants/separation = 40
-
-[node name="Symbol0" type="TextureRect" parent="SlotMachine/ReelContainer/Reel2/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-texture = ExtResource("2_frkhe")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Symbol1" type="TextureRect" parent="SlotMachine/ReelContainer/Reel2/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-texture = ExtResource("3_1p5hy")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Symbol2" type="TextureRect" parent="SlotMachine/ReelContainer/Reel2/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-texture = ExtResource("4_h1m7h")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Symbol3" type="TextureRect" parent="SlotMachine/ReelContainer/Reel2/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-texture = ExtResource("5_erwvk")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Symbol4" type="TextureRect" parent="SlotMachine/ReelContainer/Reel2/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-texture = ExtResource("14_blue7")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Explosion" type="AnimatedSprite2D" parent="SlotMachine/ReelContainer/Reel2"]
-visible = false
-position = Vector2(100, 150)
-sprite_frames = SubResource("SpriteFrames_explosion")
-animation = &"Explode"
-
-[node name="Reel3" type="Panel" parent="SlotMachine/ReelContainer"]
-custom_minimum_size = Vector2(200, 300)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_white")
-
-[node name="ClipContainer" type="Control" parent="SlotMachine/ReelContainer/Reel3"]
-clip_contents = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="SymbolStrip" type="VBoxContainer" parent="SlotMachine/ReelContainer/Reel3/ClipContainer"]
-layout_mode = 1
-offset_right = 200.0
-offset_bottom = 1200.0
-theme_override_constants/separation = 40
-
-[node name="Symbol0" type="TextureRect" parent="SlotMachine/ReelContainer/Reel3/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-texture = ExtResource("2_frkhe")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Symbol1" type="TextureRect" parent="SlotMachine/ReelContainer/Reel3/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-texture = ExtResource("3_1p5hy")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Symbol2" type="TextureRect" parent="SlotMachine/ReelContainer/Reel3/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-texture = ExtResource("4_h1m7h")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Symbol3" type="TextureRect" parent="SlotMachine/ReelContainer/Reel3/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-texture = ExtResource("5_erwvk")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Symbol4" type="TextureRect" parent="SlotMachine/ReelContainer/Reel3/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-texture = ExtResource("14_blue7")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Explosion" type="AnimatedSprite2D" parent="SlotMachine/ReelContainer/Reel3"]
-visible = false
-position = Vector2(100, 150)
-sprite_frames = SubResource("SpriteFrames_explosion")
-animation = &"Explode"
+mouse_filter = 2
+script = ExtResource("grid_overlay_script")
 
 [node name="SpinButton" type="Button" parent="SlotMachine"]
 visible = false
@@ -280,11 +109,27 @@ offset_right = 75.0
 offset_bottom = 220.0
 text = "SPIN"
 
-[node name="Lever" type="TextureButton" parent="SlotMachine"]
-position = Vector2(450, -100)
-scale = Vector2(0.5, 0.5)
-texture_normal = ExtResource("lever_texture")
-stretch_mode = 0
+[node name="Lever" type="Control" parent="SlotMachine"]
+offset_left = 430.0
+offset_top = -120.0
+offset_right = 490.0
+offset_bottom = 80.0
+
+[node name="LeverButton" type="Button" parent="SlotMachine/Lever"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LeverSprite" type="Sprite2D" parent="SlotMachine/Lever"]
+position = Vector2(30, 100)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("lever_spritesheet")
+hframes = 4
+frame = 0
 
 [node name="CreditsLabel" type="Label" parent="SlotMachine"]
 visible = false
