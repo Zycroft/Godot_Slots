@@ -82,6 +82,7 @@ func _ready():
 
 	# Connect to config changes
 	GameConfig.config_changed.connect(_on_config_changed)
+	GameConfig.card_purchased.connect(_on_card_purchased)
 
 	# Build initial reels from config
 	_rebuild_reels()
@@ -328,9 +329,6 @@ func _stop_spin():
 	# Spawn coins when spin stops
 	_spawn_coins()
 
-	# Expand game after every spin
-	_expand_game()
-
 func _spawn_coins():
 	for i in range(coins_to_spawn):
 		var coin = Sprite2D.new()
@@ -393,12 +391,17 @@ func _on_lever_reset():
 func apply_new_config(config_data: Dictionary):
 	GameConfig.update_config(config_data)
 
-func _expand_game():
-	# Add one more reel
-	var new_num_reels = GameConfig.num_reels + 1
+func _on_card_purchased(card_id: String):
+	match card_id:
+		"reel":
+			add_reel()
+		"payline":
+			add_payline()
+		"symbol":
+			add_symbol()
 
-	# Add one more visible row
-	var new_visible_rows = GameConfig.visible_rows + 1
+func add_reel():
+	var new_num_reels = GameConfig.num_reels + 1
 
 	# Create new reel with shuffled symbols
 	var base_symbols = ["cherry", "lemon", "red7", "grape", "creature"]
@@ -410,22 +413,64 @@ func _expand_game():
 	var new_reels = GameConfig.reels.duplicate(true)
 	new_reels.append({"symbols": new_reel_symbols})
 
-	# Add a new payline (using the new row)
-	var new_paylines = GameConfig.paylines.duplicate(true)
-	var new_payline = []
-	for i in range(new_num_reels):
-		new_payline.append(new_visible_rows - 1)  # Bottom row
-	new_paylines.append(new_payline)
-
 	# Update existing paylines to match new reel count
-	for i in range(new_paylines.size() - 1):
+	var new_paylines = GameConfig.paylines.duplicate(true)
+	for i in range(new_paylines.size()):
 		while new_paylines[i].size() < new_num_reels:
 			new_paylines[i].append(0)
 
-	# Apply the expanded config
 	GameConfig.update_config({
 		"num_reels": new_num_reels,
-		"visible_rows": new_visible_rows,
 		"reels": new_reels,
 		"paylines": new_paylines
+	})
+
+func add_payline():
+	var new_visible_rows = GameConfig.visible_rows + 1
+
+	# Add a new payline on the new bottom row
+	var new_paylines = GameConfig.paylines.duplicate(true)
+	var new_payline = []
+	for i in range(GameConfig.num_reels):
+		new_payline.append(new_visible_rows - 1)
+	new_paylines.append(new_payline)
+
+	GameConfig.update_config({
+		"visible_rows": new_visible_rows,
+		"paylines": new_paylines
+	})
+
+func add_symbol():
+	# List of available symbols to add
+	var available_symbols = {
+		"orange": "res://assets.sprites/Orange.tres",
+		"plum": "res://assets.sprites/plum.tres",
+		"star": "res://assets.sprites/star.tres",
+		"crown": "res://assets.sprites/crown.tres",
+		"diamond": "res://assets.sprites/Diamond.tres"
+	}
+
+	# Find a symbol not already in use
+	var new_symbol_name = ""
+	for symbol_name in available_symbols:
+		if not GameConfig.symbols.has(symbol_name):
+			new_symbol_name = symbol_name
+			break
+
+	if new_symbol_name == "":
+		return  # All symbols already added
+
+	# Add the new symbol
+	var new_symbols = GameConfig.symbols.duplicate()
+	new_symbols[new_symbol_name] = available_symbols[new_symbol_name]
+
+	# Add the new symbol to all reels
+	var new_reels = GameConfig.reels.duplicate(true)
+	for reel in new_reels:
+		if reel.has("symbols"):
+			reel["symbols"].append(new_symbol_name)
+
+	GameConfig.update_config({
+		"symbols": new_symbols,
+		"reels": new_reels
 	})

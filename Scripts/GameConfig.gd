@@ -1,7 +1,8 @@
 extends Node
 
-# Signal emitted when config changes
+# Signals
 signal config_changed
+signal card_purchased(card_id: String)
 
 # Config file path
 const CONFIG_PATH = "res://Config/game_config.json"
@@ -28,6 +29,31 @@ var credits: int = 100
 var hours_remaining: float = 8.0
 var spin_cost: int = 1
 var hours_per_spin: float = 0.5
+
+# Loyalty Card System
+var owned_cards: Array = []
+
+# Card definitions
+const CARD_DEFINITIONS = {
+	"reel": {
+		"name": "Reel Card",
+		"description": "+1 Reel",
+		"cost": 50,
+		"effect": "add_reel"
+	},
+	"payline": {
+		"name": "Payline Card",
+		"description": "+1 Row & Payline",
+		"cost": 30,
+		"effect": "add_payline"
+	},
+	"symbol": {
+		"name": "Symbol Card",
+		"description": "+1 Symbol",
+		"cost": 100,
+		"effect": "add_symbol"
+	}
+}
 
 # Cached textures
 var _symbol_textures: Dictionary = {}
@@ -159,3 +185,23 @@ func save_config(path: String = CONFIG_PATH) -> bool:
 	file.store_string(json_text)
 	file.close()
 	return true
+
+# Card system methods
+func can_afford_card(card_id: String) -> bool:
+	if not CARD_DEFINITIONS.has(card_id):
+		return false
+	return credits >= CARD_DEFINITIONS[card_id]["cost"]
+
+func buy_card(card_id: String) -> bool:
+	if not can_afford_card(card_id):
+		return false
+
+	var card = CARD_DEFINITIONS[card_id]
+	credits -= card["cost"]
+	owned_cards.append(card_id)
+	card_purchased.emit(card_id)
+	config_changed.emit()
+	return true
+
+func get_card_count(card_id: String) -> int:
+	return owned_cards.count(card_id)
