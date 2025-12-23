@@ -46,6 +46,12 @@ var is_lever_pulling: bool = false
 
 # Preloaded scripts
 var grid_overlay_script = preload("res://Scripts/GridOverlay.gd")
+var coin_script = preload("res://Scripts/CoinAnimation.gd")
+
+# Coin spawning
+var coin_texture: Texture2D
+@export var coins_to_spawn: int = 5
+@export var coin_spawn_delay: float = 0.1
 
 # Style for reel panels
 var reel_style: StyleBoxFlat
@@ -82,6 +88,9 @@ func _ready():
 
 	# Initialize HUD
 	_update_hud()
+
+	# Load coin texture
+	coin_texture = load("res://Assets/SingleImages/output/gold_coin_strip.png")
 
 func _on_config_changed():
 	# Rebuild reels when config changes (only if not spinning)
@@ -316,6 +325,31 @@ func _stop_spin():
 	sfx_reel_spin.stop()
 	spin_button.disabled = false
 	lever_button.disabled = false
+
+	# Spawn coins when spin stops
+	_spawn_coins()
+
+func _spawn_coins():
+	for i in range(coins_to_spawn):
+		var coin = Sprite2D.new()
+		coin.texture = coin_texture
+		coin.hframes = 144
+		coin.scale = Vector2(0.8, 0.8)
+
+		# Random position across the tray area
+		var base_x = randf_range(-200, 200)
+		var base_y = 310  # Above the tray
+		coin.position = Vector2(base_x, base_y)
+
+		coin.set_script(coin_script)
+		add_child(coin)
+
+		# Trigger drop with delay
+		var delay = i * coin_spawn_delay
+		get_tree().create_timer(delay).timeout.connect(coin.drop)
+
+		# Remove coin after animation finishes
+		get_tree().create_timer(delay + 2.0).timeout.connect(coin.queue_free)
 
 func _update_credits_display():
 	credits_label.text = "Credits: " + str(GameConfig.credits)
