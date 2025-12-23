@@ -2,7 +2,7 @@ extends Node2D
 
 # Reel container reference
 @onready var reel_container: HBoxContainer = $ReelContainer
-@onready var reel_background: ColorRect = $ReelBackground
+@onready var reel_background: Panel = $ReelBackground
 
 @onready var spin_button: Button = $SpinButton
 @onready var credits_label: Label = $CreditsLabel
@@ -55,14 +55,24 @@ func _ready():
 	lever_button.pressed.connect(_on_lever_clicked)
 	lever_start_pos = lever.position
 
+	# Create background panel style with 4px border
+	var bg_style = StyleBoxFlat.new()
+	bg_style.bg_color = Color(0.35, 0.35, 0.35, 1)
+	bg_style.border_width_left = 4
+	bg_style.border_width_top = 4
+	bg_style.border_width_right = 4
+	bg_style.border_width_bottom = 4
+	bg_style.border_color = Color(0, 0, 0, 1)
+	reel_background.add_theme_stylebox_override("panel", bg_style)
+
 	# Create reel panel style
 	reel_style = StyleBoxFlat.new()
 	reel_style.bg_color = Color(1, 1, 1, 1)
-	reel_style.border_width_left = 3
-	reel_style.border_width_top = 3
-	reel_style.border_width_right = 3
-	reel_style.border_width_bottom = 3
-	reel_style.border_color = Color(0, 0, 1, 1)
+	reel_style.border_width_left = 2
+	reel_style.border_width_top = 2
+	reel_style.border_width_right = 2
+	reel_style.border_width_bottom = 2
+	reel_style.border_color = Color(0, 0, 0, 1)
 
 	# Connect to config changes
 	GameConfig.config_changed.connect(_on_config_changed)
@@ -108,8 +118,8 @@ func _rebuild_reels():
 	reel_background.offset_top = -(reel_height / 2) - padding
 	reel_background.offset_bottom = (reel_height / 2) + padding
 
-	# Update lever position
-	lever.offset_left = (total_width / 2) + padding + 15
+	# Update lever position (just right of reel background)
+	lever.offset_left = (total_width / 2) + padding - 15
 	lever.offset_right = lever.offset_left + 60
 
 	# Initialize arrays
@@ -154,6 +164,8 @@ func _create_reel(reel_index: int, width: float, height: float, num_slots: int):
 	clip.set_anchors_preset(Control.PRESET_FULL_RECT)
 	clip.offset_left = 2
 	clip.offset_right = -2
+	clip.offset_top = 2
+	clip.offset_bottom = -2
 	panel.add_child(clip)
 
 	# Create SymbolStrip

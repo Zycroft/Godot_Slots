@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://Scripts/SlotMachine.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/lever_spritesheet2_pixel.png" id="lever_spritesheet"]
@@ -7,6 +7,7 @@
 [ext_resource type="AudioStream" path="res://Audio/SFX/slot_win.mp3" id="audio_slot_win"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/spin_start.mp3" id="audio_spin_start"]
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/casino_marker_bg.png" id="marker_bg"]
+[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/ChromeBackground.png" id="chrome_bg"]
 
 [node name="Main" type="Node2D"]
 
@@ -21,12 +22,11 @@ color = Color(0.94, 0.92, 0.84, 1)
 position = Vector2(960, 540)
 script = ExtResource("1_script")
 
-[node name="ReelBackground" type="ColorRect" parent="SlotMachine"]
+[node name="ReelBackground" type="Panel" parent="SlotMachine"]
 offset_left = -350.0
 offset_top = -180.0
 offset_right = 350.0
 offset_bottom = 180.0
-color = Color(0.15, 0.15, 0.15, 1)
 
 [node name="ReelContainer" type="HBoxContainer" parent="SlotMachine"]
 offset_left = -320.0
@@ -44,9 +44,9 @@ offset_bottom = 220.0
 text = "SPIN"
 
 [node name="Lever" type="Control" parent="SlotMachine"]
-offset_left = 365.0
+offset_left = 201.0
 offset_top = -120.0
-offset_right = 425.0
+offset_right = 261.0
 offset_bottom = 80.0
 
 [node name="LeverButton" type="Button" parent="SlotMachine/Lever"]
@@ -59,7 +59,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="LeverSprite" type="Sprite2D" parent="SlotMachine/Lever"]
-position = Vector2(30, 100)
+position = Vector2(29, 100)
 scale = Vector2(1.5, 1.5)
 texture = ExtResource("lever_spritesheet")
 hframes = 4
