@@ -44,6 +44,9 @@ var final_symbols: Array = []
 var lever_start_pos: Vector2
 var is_lever_pulling: bool = false
 
+# First spin tracking
+var is_first_spin: bool = true
+
 # Preloaded scripts
 var grid_overlay_script = preload("res://Scripts/GridOverlay.gd")
 var coin_script = preload("res://Scripts/CoinAnimation.gd")
@@ -198,9 +201,10 @@ func _create_reel(reel_index: int, width: float, height: float, num_slots: int):
 		var tex_rect = TextureRect.new()
 		tex_rect.name = "Symbol%d" % slot_index if slot_index < num_slots else "Symbol%d_wrap" % slot_index
 		tex_rect.custom_minimum_size = Vector2(SYMBOL_HEIGHT, SYMBOL_HEIGHT)
+		tex_rect.size = Vector2(SYMBOL_HEIGHT, SYMBOL_HEIGHT)
 		tex_rect.texture = GameConfig.get_symbol_texture(symbol_name)
-		tex_rect.expand_mode = TextureRect.EXPAND_KEEP_SIZE
-		tex_rect.stretch_mode = TextureRect.STRETCH_KEEP
+		tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		strip.add_child(tex_rect)
 
 	# Create GridOverlay
@@ -285,14 +289,12 @@ func _update_reel_position(reel_index: int):
 
 	var strip = reel_strips[reel_index]
 	var reelslots = GameConfig.reelslots
-	var visible_rows = GameConfig.visible_rows
 
 	var main_strip_height = reelslots * SYMBOL_TOTAL_HEIGHT
 	var visual_pos = fmod(reel_positions[reel_index], main_strip_height)
 
-	var reel_height = visible_rows * SYMBOL_HEIGHT
-	var payline_offset = (reel_height / 2.0) - (SYMBOL_HEIGHT / 2.0)
-	strip.position.y = -visual_pos + payline_offset
+	# Simply position the strip so symbols align with the visible area
+	strip.position.y = -visual_pos
 
 func _on_spin_pressed():
 	if is_spinning or GameConfig.credits < GameConfig.spin_cost or GameConfig.hours_remaining < GameConfig.hours_per_spin:
@@ -328,6 +330,11 @@ func _stop_spin():
 
 	# Spawn coins when spin stops
 	_spawn_coins()
+
+	# After first spin, add a reel and a payline
+	if is_first_spin:
+		is_first_spin = false
+		_expand_game()
 
 func _spawn_coins():
 	for i in range(coins_to_spawn):
@@ -390,3 +397,40 @@ func _on_lever_reset():
 # Public method to update config at runtime
 func apply_new_config(config_data: Dictionary):
 	GameConfig.update_config(config_data)
+
+func _expand_game():
+	# Add one more reel
+	var new_num_reels = GameConfig.num_reels + 1
+
+	# Add one more visible row
+	var new_visible_rows = GameConfig.visible_rows + 1
+
+	# Create new reel with shuffled symbols
+	var base_symbols = ["cherry", "lemon", "red7", "grape", "creature"]
+	var new_reel_symbols = []
+	for i in range(GameConfig.reelslots):
+		new_reel_symbols.append(base_symbols[i % base_symbols.size()])
+	new_reel_symbols.shuffle()
+
+	var new_reels = GameConfig.reels.duplicate(true)
+	new_reels.append({"symbols": new_reel_symbols})
+
+	# Add a new payline (using the new row)
+	var new_paylines = GameConfig.paylines.duplicate(true)
+	var new_payline = []
+	for i in range(new_num_reels):
+		new_payline.append(new_visible_rows - 1)  # Bottom row
+	new_paylines.append(new_payline)
+
+	# Update existing paylines to match new reel count
+	for i in range(new_paylines.size() - 1):
+		while new_paylines[i].size() < new_num_reels:
+			new_paylines[i].append(0)
+
+	# Apply the expanded config
+	GameConfig.update_config({
+		"num_reels": new_num_reels,
+		"visible_rows": new_visible_rows,
+		"reels": new_reels,
+		"paylines": new_paylines
+	})
