@@ -14,6 +14,10 @@ config/name="Roguelike Slots"
 run/main_scene="res://Scenes/Main.tscn"
 config/features=PackedStringArray("4.5", "Forward Plus")
 
+[autoload]
+
+GameConfig="*res://Scripts/GameConfig.gd"
+
 [display]
 
 window/size/viewport_width=1920

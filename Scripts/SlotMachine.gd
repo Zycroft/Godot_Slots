@@ -2,6 +2,7 @@ extends Node2D
 
 # Reel container reference
 @onready var reel_container: HBoxContainer = $ReelContainer
+@onready var reel_background: ColorRect = $ReelBackground
 
 @onready var spin_button: Button = $SpinButton
 @onready var credits_label: Label = $CreditsLabel
@@ -19,95 +20,181 @@ extends Node2D
 @onready var sfx_reel_stop: AudioStreamPlayer = $SFX/ReelStop
 @onready var sfx_slot_win: AudioStreamPlayer = $SFX/SlotWin
 
-# Symbol textures - loaded at runtime
-var symbol_textures: Array = []
-
-# Reel configuration
-@export var num_reels: int = 5  # Number of reels (1-5)
-@export var visible_rows: int = 3  # Visible rows per reel (1-5)
-@export var reelslots: int = 10  # Number of actual symbol positions (0-9)
-@export var spin_direction_down: bool = true  # true = down, false = up
-const WRAP_BUFFER: int = 3  # Extra symbols at end for seamless wrap
+# Constants
+const WRAP_BUFFER: int = 3
 const SYMBOL_HEIGHT: float = 100.0
 const SYMBOL_SPACING: float = 0.0
 const SYMBOL_TOTAL_HEIGHT: float = SYMBOL_HEIGHT + SYMBOL_SPACING
-const REEL_STOP_DELAY: float = 0.3  # Delay between each reel stopping
+const BASE_SPEED: float = 2000.0
+const DECEL_RATE: float = 800.0
 
 # Spin state
-var credits: int = 100
-var hours_remaining: float = 8.0
-const HOURS_PER_SPIN: float = 0.5
-const SPIN_COST: int = 1
 var is_spinning: bool = false
 var spin_time: float = 0.0
-var spin_duration: float = 2.5
 
-# Per-reel state (dynamically sized based on num_reels)
+# Per-reel state (dynamically sized)
+var reel_panels: Array = []
 var reel_strips: Array = []
 var reel_speeds: Array = []
 var reel_positions: Array = []
 var reels_stopped: Array = []
 var final_symbols: Array = []
 
-# Spin physics
-const BASE_SPEED: float = 2000.0
-const DECEL_RATE: float = 800.0
-
-# Win symbol index (Bar = index 3)
-const WIN_SYMBOL = 3
-
-
 # Lever state
 var lever_start_pos: Vector2
 var is_lever_pulling: bool = false
-const LEVER_FRAMES: int = 4
+
+# Preloaded scripts
+var grid_overlay_script = preload("res://Scripts/GridOverlay.gd")
+
+# Style for reel panels
+var reel_style: StyleBoxFlat
 
 func _ready():
 	spin_button.pressed.connect(_on_spin_pressed)
 	lever_button.pressed.connect(_on_lever_clicked)
 	lever_start_pos = lever.position
 
-	# Dynamically find reel strips based on num_reels
-	for i in range(num_reels):
-		var reel_path = "Reel%d/ClipContainer/SymbolStrip" % (i + 1)
-		var strip = reel_container.get_node_or_null(reel_path)
-		if strip:
-			reel_strips.append(strip)
-		else:
-			push_warning("Reel%d not found in scene" % (i + 1))
+	# Create reel panel style
+	reel_style = StyleBoxFlat.new()
+	reel_style.bg_color = Color(1, 1, 1, 1)
+	reel_style.border_width_left = 3
+	reel_style.border_width_top = 3
+	reel_style.border_width_right = 3
+	reel_style.border_width_bottom = 3
+	reel_style.border_color = Color(0, 0, 1, 1)
 
-	# Initialize per-reel arrays
-	for i in range(num_reels):
-		reel_speeds.append(0.0)
-		reel_positions.append(0.0)
-		reels_stopped.append(false)
-		final_symbols.append(0)
+	# Connect to config changes
+	GameConfig.config_changed.connect(_on_config_changed)
 
-	# Load symbol textures from the first reel's children
-	if reel_strips.size() > 0:
-		for child in reel_strips[0].get_children():
-			if child is TextureRect:
-				symbol_textures.append(child.texture)
-
-	# Update symbol visibility based on reelslots
-	_update_symbol_visibility()
-
-	# Initialize reels at fixed position (Symbol1 = Payline centered)
-	for i in range(num_reels):
-		reel_positions[i] = 1 * SYMBOL_TOTAL_HEIGHT  # Start at symbol index 1 (Payline)
-		_update_reel_position(i)
+	# Build initial reels from config
+	_rebuild_reels()
 
 	# Initialize HUD
 	_update_hud()
 
-func _update_symbol_visibility():
-	# Show all symbols (main + wrap buffer)
-	var total_symbols = reelslots + WRAP_BUFFER
-	for strip in reel_strips:
-		var children = strip.get_children()
-		for i in range(children.size()):
-			if children[i] is TextureRect:
-				children[i].visible = i < total_symbols
+func _on_config_changed():
+	# Rebuild reels when config changes (only if not spinning)
+	if not is_spinning:
+		_rebuild_reels()
+		_update_hud()
+
+func _rebuild_reels():
+	# Clear existing reels
+	_clear_reels()
+
+	# Get config values
+	var num_reels = GameConfig.num_reels
+	var visible_rows = GameConfig.visible_rows
+	var reelslots = GameConfig.reelslots
+
+	# Calculate dimensions
+	var reel_height = visible_rows * SYMBOL_HEIGHT
+	var reel_width = 104.0
+	var reel_spacing = 30.0
+
+	# Update container dimensions
+	var total_width = (num_reels * reel_width) + ((num_reels - 1) * reel_spacing)
+	reel_container.set("theme_override_constants/separation", int(reel_spacing))
+	reel_container.offset_left = -total_width / 2
+	reel_container.offset_right = total_width / 2
+	reel_container.offset_top = -reel_height / 2
+	reel_container.offset_bottom = reel_height / 2
+
+	# Update background
+	var padding = 30.0
+	reel_background.offset_left = -(total_width / 2) - padding
+	reel_background.offset_right = (total_width / 2) + padding
+	reel_background.offset_top = -(reel_height / 2) - padding
+	reel_background.offset_bottom = (reel_height / 2) + padding
+
+	# Update lever position
+	lever.offset_left = (total_width / 2) + padding + 15
+	lever.offset_right = lever.offset_left + 60
+
+	# Initialize arrays
+	reel_panels = []
+	reel_strips = []
+	reel_speeds = []
+	reel_positions = []
+	reels_stopped = []
+	final_symbols = []
+
+	# Create reels
+	for i in range(num_reels):
+		_create_reel(i, reel_width, reel_height, reelslots)
+
+	# Initialize reel positions
+	for i in range(num_reels):
+		reel_positions[i] = 1 * SYMBOL_TOTAL_HEIGHT
+		_update_reel_position(i)
+
+func _clear_reels():
+	# Remove all existing reel panels
+	for panel in reel_panels:
+		if is_instance_valid(panel):
+			panel.queue_free()
+	reel_panels.clear()
+	reel_strips.clear()
+
+func _create_reel(reel_index: int, width: float, height: float, num_slots: int):
+	# Create Panel
+	var panel = Panel.new()
+	panel.name = "Reel%d" % (reel_index + 1)
+	panel.custom_minimum_size = Vector2(width, height)
+	panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	panel.add_theme_stylebox_override("panel", reel_style)
+	reel_container.add_child(panel)
+	reel_panels.append(panel)
+
+	# Create ClipContainer
+	var clip = Control.new()
+	clip.name = "ClipContainer"
+	clip.clip_contents = true
+	clip.set_anchors_preset(Control.PRESET_FULL_RECT)
+	clip.offset_left = 2
+	clip.offset_right = -2
+	panel.add_child(clip)
+
+	# Create SymbolStrip
+	var strip = VBoxContainer.new()
+	strip.name = "SymbolStrip"
+	strip.offset_right = 100
+	strip.offset_bottom = (num_slots + WRAP_BUFFER) * SYMBOL_TOTAL_HEIGHT
+	strip.set("theme_override_constants/separation", 0)
+	clip.add_child(strip)
+	reel_strips.append(strip)
+
+	# Get symbol configuration for this reel
+	var reel_symbols = GameConfig.get_reel_symbols(reel_index)
+	var total_symbols = num_slots + WRAP_BUFFER
+
+	# Create symbols
+	for slot_index in range(total_symbols):
+		var symbol_index = slot_index % reel_symbols.size() if reel_symbols.size() > 0 else 0
+		var symbol_name = reel_symbols[symbol_index] if symbol_index < reel_symbols.size() else "cherry"
+
+		var tex_rect = TextureRect.new()
+		tex_rect.name = "Symbol%d" % slot_index if slot_index < num_slots else "Symbol%d_wrap" % slot_index
+		tex_rect.custom_minimum_size = Vector2(SYMBOL_HEIGHT, SYMBOL_HEIGHT)
+		tex_rect.texture = GameConfig.get_symbol_texture(symbol_name)
+		tex_rect.expand_mode = TextureRect.EXPAND_KEEP_SIZE
+		tex_rect.stretch_mode = TextureRect.STRETCH_KEEP
+		strip.add_child(tex_rect)
+
+	# Create GridOverlay
+	var overlay = Control.new()
+	overlay.name = "GridOverlay"
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.set_script(grid_overlay_script)
+	panel.add_child(overlay)
+
+	# Initialize per-reel state
+	reel_speeds.append(0.0)
+	reel_positions.append(0.0)
+	reels_stopped.append(false)
+	final_symbols.append(0)
 
 func _process(delta):
 	if is_spinning:
@@ -119,26 +206,27 @@ func _unhandled_input(event):
 		_on_lever_clicked()
 
 func _update_spin(delta):
+	var num_reels = GameConfig.num_reels
+	var reelslots = GameConfig.reelslots
+
 	for i in range(num_reels):
 		if reels_stopped[i]:
 			continue
 
-		# Calculate when this reel should start stopping (staggered per reel)
-		var stop_start_time = spin_duration * 0.4 + (i * REEL_STOP_DELAY)
+		# Calculate when this reel should start stopping (staggered)
+		var stop_start_time = GameConfig.spin_duration * 0.4 + (i * GameConfig.reel_stop_delay)
 
 		if spin_time > stop_start_time:
 			# Decelerate
 			reel_speeds[i] = max(0, reel_speeds[i] - DECEL_RATE * delta)
 
 			if reel_speeds[i] <= 0:
-				# Snap to nearest symbol
 				_stop_reel(i)
 				continue
 
 		# Update position based on spin direction
-		if spin_direction_down:
+		if GameConfig.spin_direction_down:
 			reel_positions[i] -= reel_speeds[i] * delta
-			# Keep position positive for modulo
 			var main_strip_height = reelslots * SYMBOL_TOTAL_HEIGHT
 			if reel_positions[i] < 0:
 				reel_positions[i] += main_strip_height
@@ -159,10 +247,9 @@ func _stop_reel(reel_index: int):
 	reels_stopped[reel_index] = true
 	reel_speeds[reel_index] = 0
 
-	# Play reel stop sound
 	sfx_reel_stop.play()
 
-	# Snap to nearest symbol position within main slots (0 to reelslots-1)
+	var reelslots = GameConfig.reelslots
 	var main_strip_height = reelslots * SYMBOL_TOTAL_HEIGHT
 	var current_pos = fmod(reel_positions[reel_index], main_strip_height)
 	var symbol_index = int(round(current_pos / SYMBOL_TOTAL_HEIGHT)) % reelslots
@@ -172,23 +259,26 @@ func _stop_reel(reel_index: int):
 	_update_reel_position(reel_index)
 
 func _update_reel_position(reel_index: int):
-	# Move the strip up as position increases (symbols scroll down)
+	if reel_index >= reel_strips.size():
+		return
+
 	var strip = reel_strips[reel_index]
-	# Use modulo for seamless looping over the main symbols only
+	var reelslots = GameConfig.reelslots
+	var visible_rows = GameConfig.visible_rows
+
 	var main_strip_height = reelslots * SYMBOL_TOTAL_HEIGHT
 	var visual_pos = fmod(reel_positions[reel_index], main_strip_height)
-	# Calculate payline offset based on visible rows
-	# For 1 row: center at 45px (original), for 3 rows: center middle row
+
 	var reel_height = visible_rows * SYMBOL_HEIGHT
 	var payline_offset = (reel_height / 2.0) - (SYMBOL_HEIGHT / 2.0)
 	strip.position.y = -visual_pos + payline_offset
 
 func _on_spin_pressed():
-	if is_spinning or credits < SPIN_COST or hours_remaining < HOURS_PER_SPIN:
+	if is_spinning or GameConfig.credits < GameConfig.spin_cost or GameConfig.hours_remaining < GameConfig.hours_per_spin:
 		return
 
-	credits -= SPIN_COST
-	hours_remaining -= HOURS_PER_SPIN
+	GameConfig.credits -= GameConfig.spin_cost
+	GameConfig.hours_remaining -= GameConfig.hours_per_spin
 	_update_credits_display()
 	_update_hud()
 
@@ -197,7 +287,7 @@ func _on_spin_pressed():
 	spin_button.disabled = true
 	lever_button.disabled = true
 
-	# Reset all reels
+	var num_reels = GameConfig.num_reels
 	for i in range(num_reels):
 		reels_stopped[i] = false
 		reel_positions[i] = 0.0
@@ -206,43 +296,36 @@ func _on_spin_pressed():
 	for strip in reel_strips:
 		strip.visible = true
 
-	# Play spin start sound and looping reel spin
 	sfx_spin_start.play()
 	sfx_reel_spin.play()
 
 func _stop_spin():
 	is_spinning = false
-
-	# Stop the spinning sound
 	sfx_reel_spin.stop()
-
-	# No win check for single reel test - just re-enable buttons
 	spin_button.disabled = false
 	lever_button.disabled = false
 
-
 func _update_credits_display():
-	credits_label.text = "Credits: " + str(credits)
+	credits_label.text = "Credits: " + str(GameConfig.credits)
 
 func _update_hud():
-	amount_label.text = "$" + str(credits)
-	due_label.text = str(int(hours_remaining))
+	amount_label.text = "$" + str(GameConfig.credits)
+	due_label.text = str(int(GameConfig.hours_remaining))
 
 func _on_lever_clicked():
-	if is_spinning or is_lever_pulling or lever_button.disabled or credits < SPIN_COST or hours_remaining < HOURS_PER_SPIN:
+	if is_spinning or is_lever_pulling or lever_button.disabled:
+		return
+	if GameConfig.credits < GameConfig.spin_cost or GameConfig.hours_remaining < GameConfig.hours_per_spin:
 		return
 
 	is_lever_pulling = true
 	lever_button.disabled = true
 
-	# Animate lever sprite frames (pull down animation)
 	var tween = create_tween()
-	# Go through frames 0 -> 1 -> 2 -> 3 (pull down)
 	tween.tween_property(lever_sprite, "frame", 1, 0.05)
 	tween.tween_property(lever_sprite, "frame", 2, 0.05)
 	tween.tween_property(lever_sprite, "frame", 3, 0.05)
 	tween.tween_callback(_start_spin_from_lever)
-	# Go back 3 -> 2 -> 1 -> 0 (return)
 	tween.tween_interval(0.1)
 	tween.tween_property(lever_sprite, "frame", 2, 0.06)
 	tween.tween_property(lever_sprite, "frame", 1, 0.06)
@@ -257,3 +340,7 @@ func _on_lever_reset():
 	lever_sprite.frame = 0
 	if not is_spinning:
 		lever_button.disabled = false
+
+# Public method to update config at runtime
+func apply_new_config(config_data: Dictionary):
+	GameConfig.update_config(config_data)

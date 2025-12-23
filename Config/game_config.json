@@ -1,0 +1,37 @@
+{
+	"num_reels": 3,
+	"visible_rows": 1,
+	"reelslots": 10,
+	"spin_direction_down": true,
+	"spin_duration": 2.5,
+	"reel_stop_delay": 0.3,
+	"symbols": {
+		"cherry": "res://Assets/SingleImages/output/Cherry.png",
+		"lemon": "res://Assets/SingleImages/output/Lemon.png",
+		"red7": "res://Assets/SingleImages/output/Red7.png"
+	},
+	"reels": [
+		{
+			"symbols": ["cherry", "lemon", "red7", "cherry", "lemon", "red7", "cherry", "lemon", "red7", "cherry"]
+		},
+		{
+			"symbols": ["lemon", "red7", "cherry", "lemon", "red7", "cherry", "lemon", "red7", "cherry", "lemon"]
+		},
+		{
+			"symbols": ["red7", "cherry", "lemon", "red7", "cherry", "lemon", "red7", "cherry", "lemon", "red7"]
+		},
+		{
+			"symbols": ["cherry", "red7", "lemon", "cherry", "red7", "lemon", "cherry", "red7", "lemon", "cherry"]
+		},
+		{
+			"symbols": ["lemon", "cherry", "red7", "lemon", "cherry", "red7", "lemon", "cherry", "red7", "lemon"]
+		}
+	],
+	"paylines": [
+		[0, 0, 0]
+	],
+	"credits": 100,
+	"hours_remaining": 8.0,
+	"spin_cost": 1,
+	"hours_per_spin": 0.5
+}
