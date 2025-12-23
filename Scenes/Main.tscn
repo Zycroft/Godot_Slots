@@ -10,6 +10,8 @@
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/casino_marker_bg.png" id="marker_bg"]
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/tray.png" id="tray_texture"]
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/gold_coin_strip.png" id="gold_coin"]
+[ext_resource type="Script" path="res://Scripts/StoreUI.gd" id="store_script"]
+[ext_resource type="Script" path="res://Scripts/CardDisplay.gd" id="card_display_script"]
 
 [node name="Main" type="Node2D"]
 
@@ -148,3 +150,17 @@ theme_override_font_sizes/font_size = 18
 text = "24"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Store" type="Control" parent="HUD"]
+offset_left = 1720.0
+offset_top = 200.0
+offset_right = 1900.0
+offset_bottom = 800.0
+script = ExtResource("store_script")
+
+[node name="CardDisplay" type="Control" parent="HUD"]
+offset_left = 20.0
+offset_top = 300.0
+offset_right = 180.0
+offset_bottom = 900.0
+script = ExtResource("card_display_script")
