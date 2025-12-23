@@ -14,6 +14,10 @@ const CARD_COLORS = {
 func _ready():
 	_build_display()
 	GameConfig.card_purchased.connect(_on_card_purchased)
+	GameConfig.game_reset.connect(_on_game_reset)
+
+func _on_game_reset():
+	_refresh_cards()
 
 func _build_display():
 	# Create container for cards
@@ -28,6 +32,7 @@ func _build_display():
 	title.text = "MY CARDS"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 18)
+	title.add_theme_color_override("font_color", Color(0.3, 0.3, 0.3))
 	card_container.add_child(title)
 
 	# Separator

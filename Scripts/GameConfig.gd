@@ -3,6 +3,7 @@ extends Node
 # Signals
 signal config_changed
 signal card_purchased(card_id: String)
+signal game_reset
 
 # Config file path
 const CONFIG_PATH = "res://Config/game_config.json"
@@ -32,25 +33,51 @@ var hours_per_spin: float = 0.5
 
 # Loyalty Card System
 var owned_cards: Array = []
+var card_cost_multiplier: float = 1.0
 
-# Card definitions
+# Difficulty definitions
+const DIFFICULTIES = {
+	"easy": {
+		"name": "Easy",
+		"credits": 500,
+		"hours": 24.0,
+		"card_cost_multiplier": 0.5
+	},
+	"normal": {
+		"name": "Normal",
+		"credits": 100,
+		"hours": 8.0,
+		"card_cost_multiplier": 1.0
+	},
+	"hard": {
+		"name": "Hard",
+		"credits": 50,
+		"hours": 4.0,
+		"card_cost_multiplier": 2.0
+	}
+}
+
+var current_difficulty: String = "normal"
+var game_started: bool = false
+
+# Card definitions (base costs)
 const CARD_DEFINITIONS = {
 	"reel": {
 		"name": "Reel Card",
 		"description": "+1 Reel",
-		"cost": 50,
+		"base_cost": 50,
 		"effect": "add_reel"
 	},
 	"payline": {
 		"name": "Payline Card",
 		"description": "+1 Row & Payline",
-		"cost": 30,
+		"base_cost": 30,
 		"effect": "add_payline"
 	},
 	"symbol": {
 		"name": "Symbol Card",
 		"description": "+1 Symbol",
-		"cost": 100,
+		"base_cost": 100,
 		"effect": "add_symbol"
 	}
 }
@@ -186,18 +213,37 @@ func save_config(path: String = CONFIG_PATH) -> bool:
 	file.close()
 	return true
 
+# Difficulty methods
+func start_game(difficulty: String) -> void:
+	if not DIFFICULTIES.has(difficulty):
+		difficulty = "normal"
+
+	current_difficulty = difficulty
+	var diff = DIFFICULTIES[difficulty]
+	credits = diff["credits"]
+	hours_remaining = diff["hours"]
+	card_cost_multiplier = diff["card_cost_multiplier"]
+	owned_cards.clear()
+	game_started = true
+	config_changed.emit()
+
+func get_card_cost(card_id: String) -> int:
+	if not CARD_DEFINITIONS.has(card_id):
+		return 0
+	return int(CARD_DEFINITIONS[card_id]["base_cost"] * card_cost_multiplier)
+
 # Card system methods
 func can_afford_card(card_id: String) -> bool:
 	if not CARD_DEFINITIONS.has(card_id):
 		return false
-	return credits >= CARD_DEFINITIONS[card_id]["cost"]
+	return credits >= get_card_cost(card_id)
 
 func buy_card(card_id: String) -> bool:
 	if not can_afford_card(card_id):
 		return false
 
-	var card = CARD_DEFINITIONS[card_id]
-	credits -= card["cost"]
+	var cost = get_card_cost(card_id)
+	credits -= cost
 	owned_cards.append(card_id)
 	card_purchased.emit(card_id)
 	config_changed.emit()
@@ -205,3 +251,9 @@ func buy_card(card_id: String) -> bool:
 
 func get_card_count(card_id: String) -> int:
 	return owned_cards.count(card_id)
+
+func reset_game() -> void:
+	game_started = false
+	owned_cards.clear()
+	load_config()  # Reload original config
+	game_reset.emit()
