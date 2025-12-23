@@ -44,9 +44,6 @@ var final_symbols: Array = []
 var lever_start_pos: Vector2
 var is_lever_pulling: bool = false
 
-# First spin tracking
-var is_first_spin: bool = true
-
 # Preloaded scripts
 var grid_overlay_script = preload("res://Scripts/GridOverlay.gd")
 var coin_script = preload("res://Scripts/CoinAnimation.gd")
@@ -331,10 +328,8 @@ func _stop_spin():
 	# Spawn coins when spin stops
 	_spawn_coins()
 
-	# After first spin, add a reel and a payline
-	if is_first_spin:
-		is_first_spin = false
-		_expand_game()
+	# Expand game after every spin
+	_expand_game()
 
 func _spawn_coins():
 	for i in range(coins_to_spawn):
