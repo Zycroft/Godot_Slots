@@ -295,6 +295,8 @@ func _update_reel_position(reel_index: int):
 	strip.position.y = -visual_pos
 
 func _on_spin_pressed():
+	if not GameConfig.game_started:
+		return
 	if is_spinning or GameConfig.credits < GameConfig.spin_cost or GameConfig.hours_remaining < GameConfig.hours_per_spin:
 		return
 
@@ -359,6 +361,8 @@ func _update_hud():
 	due_label.text = str(int(GameConfig.hours_remaining))
 
 func _on_lever_clicked():
+	if not GameConfig.game_started:
+		return
 	if is_spinning or is_lever_pulling or lever_button.disabled:
 		return
 	if GameConfig.credits < GameConfig.spin_cost or GameConfig.hours_remaining < GameConfig.hours_per_spin:

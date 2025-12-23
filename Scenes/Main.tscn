@@ -12,6 +12,8 @@
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/gold_coin_strip.png" id="gold_coin"]
 [ext_resource type="Script" path="res://Scripts/StoreUI.gd" id="store_script"]
 [ext_resource type="Script" path="res://Scripts/CardDisplay.gd" id="card_display_script"]
+[ext_resource type="Script" path="res://Scripts/StartScreen.gd" id="start_screen_script"]
+[ext_resource type="Script" path="res://Scripts/MarkerAnimation.gd" id="marker_script"]
 
 [node name="Main" type="Node2D"]
 
@@ -115,6 +117,7 @@ offset_left = -30.0
 offset_top = -45.0
 offset_right = 490.0
 offset_bottom = 275.0
+script = ExtResource("marker_script")
 
 [node name="Background" type="TextureRect" parent="HUD/Marker"]
 layout_mode = 1
@@ -164,3 +167,15 @@ offset_top = 300.0
 offset_right = 180.0
 offset_bottom = 900.0
 script = ExtResource("card_display_script")
+
+[node name="StartScreenLayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="StartScreen" type="Control" parent="StartScreenLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("start_screen_script")

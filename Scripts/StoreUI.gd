@@ -3,10 +3,12 @@ extends Control
 # Loyalty Cashier button that opens the shop dialog
 
 var cashier_button: Button
+var restart_button: Button
 var shop_dialog: Control
 
 func _ready():
 	_build_cashier_button()
+	_build_restart_button()
 	_build_shop_dialog()
 
 func _build_cashier_button():
@@ -16,6 +18,18 @@ func _build_cashier_button():
 	cashier_button.add_theme_font_size_override("font_size", 18)
 	cashier_button.pressed.connect(_open_shop)
 	add_child(cashier_button)
+
+func _build_restart_button():
+	restart_button = Button.new()
+	restart_button.text = "Restart\nGame"
+	restart_button.custom_minimum_size = Vector2(140, 60)
+	restart_button.position = Vector2(0, 100)
+	restart_button.add_theme_font_size_override("font_size", 16)
+	restart_button.pressed.connect(_on_restart_pressed)
+	add_child(restart_button)
+
+func _on_restart_pressed():
+	GameConfig.reset_game()
 
 func _build_shop_dialog():
 	# Create the shop dialog (hidden by default)
@@ -184,7 +198,7 @@ func _create_card_widget(card_id: String) -> Control:
 
 	# Buy button
 	var buy_btn = Button.new()
-	buy_btn.text = "$" + str(card["cost"])
+	buy_btn.text = "$" + str(GameConfig.get_card_cost(card_id))
 	buy_btn.custom_minimum_size = Vector2(130, 35)
 	buy_btn.add_theme_font_size_override("font_size", 16)
 	buy_btn.pressed.connect(_on_buy_card.bind(card_id, container))
