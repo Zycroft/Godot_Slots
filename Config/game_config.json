@@ -8,23 +8,25 @@
 	"symbols": {
 		"cherry": "res://Assets/SingleImages/output/Cherry.png",
 		"lemon": "res://Assets/SingleImages/output/Lemon.png",
-		"red7": "res://Assets/SingleImages/output/Red7.png"
+		"red7": "res://Assets/SingleImages/output/Red7.png",
+		"grape": "res://Assets/SingleImages/output/Grape.png",
+		"creature": "res://Assets/SingleImages/output/Creature.png"
 	},
 	"reels": [
 		{
-			"symbols": ["cherry", "lemon", "red7", "cherry", "lemon", "red7", "cherry", "lemon", "red7", "cherry"]
+			"symbols": ["cherry", "lemon", "red7", "grape", "creature", "cherry", "lemon", "red7", "grape", "creature"]
 		},
 		{
-			"symbols": ["lemon", "red7", "cherry", "lemon", "red7", "cherry", "lemon", "red7", "cherry", "lemon"]
+			"symbols": ["lemon", "red7", "grape", "creature", "cherry", "lemon", "red7", "grape", "creature", "cherry"]
 		},
 		{
-			"symbols": ["red7", "cherry", "lemon", "red7", "cherry", "lemon", "red7", "cherry", "lemon", "red7"]
+			"symbols": ["red7", "grape", "creature", "cherry", "lemon", "red7", "grape", "creature", "cherry", "lemon"]
 		},
 		{
-			"symbols": ["cherry", "red7", "lemon", "cherry", "red7", "lemon", "cherry", "red7", "lemon", "cherry"]
+			"symbols": ["grape", "creature", "cherry", "red7", "lemon", "grape", "creature", "cherry", "red7", "lemon"]
 		},
 		{
-			"symbols": ["lemon", "cherry", "red7", "lemon", "cherry", "red7", "lemon", "cherry", "red7", "lemon"]
+			"symbols": ["creature", "cherry", "lemon", "grape", "red7", "creature", "cherry", "lemon", "grape", "red7"]
 		}
 	],
 	"paylines": [
