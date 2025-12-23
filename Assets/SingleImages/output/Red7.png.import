@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8h5fcm5d041j"
-path="res://.godot/imported/Cherry.png-559ea250a1b1132f4dd5c3929454bcad.ctex"
+uid="uid://djw4jov6ysb87"
+path="res://.godot/imported/Red7.png-289a54c58e504ed22e71ebba08e24067.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/SingleImages/output/Cherry.png"
-dest_files=["res://.godot/imported/Cherry.png-559ea250a1b1132f4dd5c3929454bcad.ctex"]
+source_file="res://Assets/SingleImages/output/Red7.png"
+dest_files=["res://.godot/imported/Red7.png-289a54c58e504ed22e71ebba08e24067.ctex"]
 
 [params]
 

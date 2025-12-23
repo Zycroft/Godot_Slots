@@ -3,7 +3,9 @@
 [ext_resource type="Script" path="res://Scripts/SlotMachine.gd" id="1_script"]
 [ext_resource type="Script" path="res://Scripts/GridOverlay.gd" id="grid_overlay_script"]
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/lever_spritesheet2_pixel.png" id="lever_spritesheet"]
-[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/cherry.png" id="cherry_texture"]
+[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/Cherry.png" id="cherry_texture"]
+[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/Lemon.png" id="lemon_texture"]
+[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/Red7.png" id="red7_texture"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/reel_spin.mp3" id="audio_reel_spin"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/reel_stop.mp3" id="audio_reel_stop"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/slot_win.mp3" id="audio_slot_win"]
@@ -17,7 +19,7 @@ border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(1, 1, 0, 1)
+border_color = Color(0, 0, 1, 1)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lever"]
 size = Vector2(39, 131)
@@ -37,22 +39,22 @@ script = ExtResource("1_script")
 
 [node name="ReelBackground" type="ColorRect" parent="SlotMachine"]
 offset_left = -452.0
-offset_top = -195.0
+offset_top = -125.0
 offset_right = 452.0
-offset_bottom = 195.0
+offset_bottom = 125.0
 color = Color(0.15, 0.15, 0.15, 1)
 
 [node name="ReelContainer" type="HBoxContainer" parent="SlotMachine"]
 offset_left = -422.0
-offset_top = -165.0
+offset_top = -95.0
 offset_right = 422.0
-offset_bottom = 165.0
+offset_bottom = 95.0
 theme_override_constants/separation = 30
 
 [node name="Reel1" type="Panel" parent="SlotMachine/ReelContainer"]
-custom_minimum_size = Vector2(256, 300)
+custom_minimum_size = Vector2(104, 190)
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_white")
 
 [node name="ClipContainer" type="Control" parent="SlotMachine/ReelContainer/Reel1"]
@@ -61,35 +63,107 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 2.0
+offset_right = -2.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="SymbolStrip" type="VBoxContainer" parent="SlotMachine/ReelContainer/Reel1/ClipContainer"]
 layout_mode = 1
-offset_right = 256.0
-offset_bottom = 700.0
-theme_override_constants/separation = 40
+offset_right = 100.0
+offset_bottom = 1300.0
+theme_override_constants/separation = 0
 
 [node name="Symbol0" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(50, 50)
+custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
 texture = ExtResource("cherry_texture")
-expand_mode = 1
-stretch_mode = 5
+expand_mode = 0
+stretch_mode = 0
 
 [node name="Symbol1" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(50, 50)
+custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
-texture = ExtResource("cherry_texture")
-expand_mode = 1
-stretch_mode = 5
+texture = ExtResource("lemon_texture")
+expand_mode = 0
+stretch_mode = 0
 
 [node name="Symbol2" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
-custom_minimum_size = Vector2(50, 50)
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+texture = ExtResource("red7_texture")
+expand_mode = 0
+stretch_mode = 0
+
+[node name="Symbol3" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
 texture = ExtResource("cherry_texture")
-expand_mode = 1
-stretch_mode = 5
+expand_mode = 0
+stretch_mode = 0
+
+[node name="Symbol4" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+texture = ExtResource("lemon_texture")
+expand_mode = 0
+stretch_mode = 0
+
+[node name="Symbol5" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+texture = ExtResource("red7_texture")
+expand_mode = 0
+stretch_mode = 0
+
+[node name="Symbol6" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+texture = ExtResource("cherry_texture")
+expand_mode = 0
+stretch_mode = 0
+
+[node name="Symbol7" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+texture = ExtResource("lemon_texture")
+expand_mode = 0
+stretch_mode = 0
+
+[node name="Symbol8" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+texture = ExtResource("red7_texture")
+expand_mode = 0
+stretch_mode = 0
+
+[node name="Symbol9" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+texture = ExtResource("cherry_texture")
+expand_mode = 0
+stretch_mode = 0
+
+[node name="Symbol10_wrap" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+texture = ExtResource("cherry_texture")
+expand_mode = 0
+stretch_mode = 0
+
+[node name="Symbol11_wrap" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+texture = ExtResource("lemon_texture")
+expand_mode = 0
+stretch_mode = 0
+
+[node name="Symbol12_wrap" type="TextureRect" parent="SlotMachine/ReelContainer/Reel1/ClipContainer/SymbolStrip"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+texture = ExtResource("red7_texture")
+expand_mode = 0
+stretch_mode = 0
 
 [node name="GridOverlay" type="Control" parent="SlotMachine/ReelContainer/Reel1"]
 layout_mode = 1
@@ -172,7 +246,7 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("marker_bg")
 expand_mode = 1
-stretch_mode = 5
+stretch_mode = 4
 
 [node name="AmountLabel" type="Label" parent="HUD/Marker"]
 layout_mode = 1

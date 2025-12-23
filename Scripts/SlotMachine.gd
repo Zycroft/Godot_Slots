@@ -24,11 +24,12 @@ extends Node2D
 var symbol_textures: Array = []
 
 # Reel configuration
-@export var reelslots: int = 3  # Number of symbol slots on the reel (adjustable)
-const SYMBOL_HEIGHT: float = 256.0
-const SYMBOL_SPACING: float = 40.0
+@export var reelslots: int = 10  # Number of actual symbol positions (0-9)
+@export var spin_direction_down: bool = true  # true = down, false = up
+const WRAP_BUFFER: int = 3  # Extra symbols at end for seamless wrap
+const SYMBOL_HEIGHT: float = 100.0
+const SYMBOL_SPACING: float = 0.0
 const SYMBOL_TOTAL_HEIGHT: float = SYMBOL_HEIGHT + SYMBOL_SPACING
-const VISIBLE_OFFSET: float = 318.0  # Offset to center payline with partial symbols above and below
 
 # Spin state
 var credits: int = 100
@@ -82,12 +83,13 @@ func _ready():
 	_update_hud()
 
 func _update_symbol_visibility():
-	# Show only the number of symbols matching reelslots
+	# Show all symbols (main + wrap buffer)
+	var total_symbols = reelslots + WRAP_BUFFER
 	for strip in reel_strips:
 		var children = strip.get_children()
 		for i in range(children.size()):
 			if children[i] is TextureRect:
-				children[i].visible = i < reelslots
+				children[i].visible = i < total_symbols
 
 func _process(delta):
 	if is_spinning:
@@ -115,14 +117,15 @@ func _update_spin(delta):
 				_stop_reel(i)
 				continue
 
-		# Increase position to scroll symbols downward (strip moves up, symbols appear from top)
-		reel_positions[i] += reel_speeds[i] * delta
-
-		# Wrap position
-		var total_strip_height = reelslots * SYMBOL_TOTAL_HEIGHT
-		if reel_positions[i] >= total_strip_height:
-			reel_positions[i] = fmod(reel_positions[i], total_strip_height)
-
+		# Update position based on spin direction
+		if spin_direction_down:
+			reel_positions[i] -= reel_speeds[i] * delta
+			# Keep position positive for modulo
+			var main_strip_height = reelslots * SYMBOL_TOTAL_HEIGHT
+			if reel_positions[i] < 0:
+				reel_positions[i] += main_strip_height
+		else:
+			reel_positions[i] += reel_speeds[i] * delta
 		_update_reel_position(i)
 
 	# Check if stopped
@@ -136,19 +139,24 @@ func _stop_reel(reel_index: int):
 	# Play reel stop sound
 	sfx_reel_stop.play()
 
-	# Snap to nearest symbol position
-	var symbol_index = int(round(reel_positions[reel_index] / SYMBOL_TOTAL_HEIGHT)) % reelslots
+	# Snap to nearest symbol position within main slots (0 to reelslots-1)
+	var main_strip_height = reelslots * SYMBOL_TOTAL_HEIGHT
+	var current_pos = fmod(reel_positions[reel_index], main_strip_height)
+	var symbol_index = int(round(current_pos / SYMBOL_TOTAL_HEIGHT)) % reelslots
 	reel_positions[reel_index] = symbol_index * SYMBOL_TOTAL_HEIGHT
 	final_symbols[reel_index] = symbol_index
 
 	_update_reel_position(reel_index)
 
 func _update_reel_position(reel_index: int):
-	# Move the strip down (positive Y) so symbols scroll downward into view
-	# We offset by the total height to keep symbols visible as they wrap
+	# Move the strip up as position increases (symbols scroll down)
 	var strip = reel_strips[reel_index]
-	var total_strip_height = reelslots * SYMBOL_TOTAL_HEIGHT
-	strip.position.y = reel_positions[reel_index] - total_strip_height + VISIBLE_OFFSET
+	# Use modulo for seamless looping over the main symbols only
+	var main_strip_height = reelslots * SYMBOL_TOTAL_HEIGHT
+	var visual_pos = fmod(reel_positions[reel_index], main_strip_height)
+	# Offset to center symbol on payline (payline at 95px, symbol center at 50px)
+	var payline_offset = 45.0
+	strip.position.y = -visual_pos + payline_offset
 
 func _on_spin_pressed():
 	if is_spinning or credits < SPIN_COST or hours_remaining < HOURS_PER_SPIN:
@@ -164,6 +172,9 @@ func _on_spin_pressed():
 	reels_stopped = [false]
 	spin_button.disabled = true
 	lever_button.disabled = true
+
+	# Reset position to beginning of strip
+	reel_positions[0] = 0.0
 
 	for strip in reel_strips:
 		strip.visible = true

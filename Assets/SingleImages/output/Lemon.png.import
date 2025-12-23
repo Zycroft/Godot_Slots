@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8h5fcm5d041j"
-path="res://.godot/imported/Cherry.png-559ea250a1b1132f4dd5c3929454bcad.ctex"
+uid="uid://duxhy0v1xyw6o"
+path="res://.godot/imported/Lemon.png-20f868f103fbf54539b1506d3af3d298.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/SingleImages/output/Cherry.png"
-dest_files=["res://.godot/imported/Cherry.png-559ea250a1b1132f4dd5c3929454bcad.ctex"]
+source_file="res://Assets/SingleImages/output/Lemon.png"
+dest_files=["res://.godot/imported/Lemon.png-20f868f103fbf54539b1506d3af3d298.ctex"]
 
 [params]
 
