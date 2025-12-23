@@ -1,19 +1,20 @@
 extends Control
 
-const GRID_SIZE: int = 20
-const LINE_COLOR: Color = Color(1, 0, 0, 0.5)  # Red with 50% transparency
+const SYMBOL_HEIGHT: float = 100.0
+
+# Payline colors for each row
+const PAYLINE_COLORS: Array = [
+	Color(1, 0, 0, 0.8),    # Red - top row
+	Color(0, 1, 0, 0.8),    # Green - middle row
+	Color(0, 0, 1, 0.8),    # Blue - bottom row
+]
 
 func _draw():
 	var rect_size = size
+	var num_rows = int(rect_size.y / SYMBOL_HEIGHT)
 
-	# Draw vertical lines
-	for x in range(0, int(rect_size.x) + 1, GRID_SIZE):
-		draw_line(Vector2(x, 0), Vector2(x, rect_size.y), LINE_COLOR, 1.0)
-
-	# Draw horizontal lines
-	for y in range(0, int(rect_size.y) + 1, GRID_SIZE):
-		draw_line(Vector2(0, y), Vector2(rect_size.x, y), LINE_COLOR, 1.0)
-
-	# Draw center line (payline) in a different color
-	var center_y = rect_size.y / 2
-	draw_line(Vector2(0, center_y), Vector2(rect_size.x, center_y), Color(0, 1, 0, 0.8), 2.0)
+	# Draw payline for each visible row
+	for row in range(num_rows):
+		var y_pos = (row * SYMBOL_HEIGHT) + (SYMBOL_HEIGHT / 2.0)
+		var color = PAYLINE_COLORS[row % PAYLINE_COLORS.size()]
+		draw_line(Vector2(0, y_pos), Vector2(rect_size.x, y_pos), color, 2.0)

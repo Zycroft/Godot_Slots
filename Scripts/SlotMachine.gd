@@ -1,8 +1,7 @@
 extends Node2D
 
-# Symbol strips for each reel (VBoxContainer that scrolls)
-@onready var reel1_strip: VBoxContainer = $ReelContainer/Reel1/ClipContainer/SymbolStrip
-
+# Reel container reference
+@onready var reel_container: HBoxContainer = $ReelContainer
 
 @onready var spin_button: Button = $SpinButton
 @onready var credits_label: Label = $CreditsLabel
@@ -24,12 +23,15 @@ extends Node2D
 var symbol_textures: Array = []
 
 # Reel configuration
+@export var num_reels: int = 5  # Number of reels (1-5)
+@export var visible_rows: int = 3  # Visible rows per reel (1-5)
 @export var reelslots: int = 10  # Number of actual symbol positions (0-9)
 @export var spin_direction_down: bool = true  # true = down, false = up
 const WRAP_BUFFER: int = 3  # Extra symbols at end for seamless wrap
 const SYMBOL_HEIGHT: float = 100.0
 const SYMBOL_SPACING: float = 0.0
 const SYMBOL_TOTAL_HEIGHT: float = SYMBOL_HEIGHT + SYMBOL_SPACING
+const REEL_STOP_DELAY: float = 0.3  # Delay between each reel stopping
 
 # Spin state
 var credits: int = 100
@@ -40,12 +42,12 @@ var is_spinning: bool = false
 var spin_time: float = 0.0
 var spin_duration: float = 2.5
 
-# Per-reel state (single reel for testing)
+# Per-reel state (dynamically sized based on num_reels)
 var reel_strips: Array = []
-var reel_speeds: Array = [0.0]
-var reel_positions: Array = [0.0]
-var reels_stopped: Array = [false]
-var final_symbols: Array = [0]
+var reel_speeds: Array = []
+var reel_positions: Array = []
+var reels_stopped: Array = []
+var final_symbols: Array = []
 
 # Spin physics
 const BASE_SPEED: float = 2000.0
@@ -65,19 +67,35 @@ func _ready():
 	lever_button.pressed.connect(_on_lever_clicked)
 	lever_start_pos = lever.position
 
-	reel_strips = [reel1_strip]
+	# Dynamically find reel strips based on num_reels
+	for i in range(num_reels):
+		var reel_path = "Reel%d/ClipContainer/SymbolStrip" % (i + 1)
+		var strip = reel_container.get_node_or_null(reel_path)
+		if strip:
+			reel_strips.append(strip)
+		else:
+			push_warning("Reel%d not found in scene" % (i + 1))
+
+	# Initialize per-reel arrays
+	for i in range(num_reels):
+		reel_speeds.append(0.0)
+		reel_positions.append(0.0)
+		reels_stopped.append(false)
+		final_symbols.append(0)
 
 	# Load symbol textures from the first reel's children
-	for child in reel1_strip.get_children():
-		if child is TextureRect:
-			symbol_textures.append(child.texture)
+	if reel_strips.size() > 0:
+		for child in reel_strips[0].get_children():
+			if child is TextureRect:
+				symbol_textures.append(child.texture)
 
 	# Update symbol visibility based on reelslots
 	_update_symbol_visibility()
 
 	# Initialize reels at fixed position (Symbol1 = Payline centered)
-	reel_positions[0] = 1 * SYMBOL_TOTAL_HEIGHT  # Start at symbol index 1 (Payline)
-	_update_reel_position(0)
+	for i in range(num_reels):
+		reel_positions[i] = 1 * SYMBOL_TOTAL_HEIGHT  # Start at symbol index 1 (Payline)
+		_update_reel_position(i)
 
 	# Initialize HUD
 	_update_hud()
@@ -101,12 +119,12 @@ func _unhandled_input(event):
 		_on_lever_clicked()
 
 func _update_spin(delta):
-	for i in range(1):  # Single reel
+	for i in range(num_reels):
 		if reels_stopped[i]:
 			continue
 
-		# Calculate when this reel should start stopping
-		var stop_start_time = spin_duration * 0.4
+		# Calculate when this reel should start stopping (staggered per reel)
+		var stop_start_time = spin_duration * 0.4 + (i * REEL_STOP_DELAY)
 
 		if spin_time > stop_start_time:
 			# Decelerate
@@ -128,8 +146,13 @@ func _update_spin(delta):
 			reel_positions[i] += reel_speeds[i] * delta
 		_update_reel_position(i)
 
-	# Check if stopped
-	if reels_stopped[0]:
+	# Check if all reels stopped
+	var all_stopped = true
+	for i in range(num_reels):
+		if not reels_stopped[i]:
+			all_stopped = false
+			break
+	if all_stopped:
 		_stop_spin()
 
 func _stop_reel(reel_index: int):
@@ -154,8 +177,10 @@ func _update_reel_position(reel_index: int):
 	# Use modulo for seamless looping over the main symbols only
 	var main_strip_height = reelslots * SYMBOL_TOTAL_HEIGHT
 	var visual_pos = fmod(reel_positions[reel_index], main_strip_height)
-	# Offset to center symbol on payline (payline at 95px, symbol center at 50px)
-	var payline_offset = 45.0
+	# Calculate payline offset based on visible rows
+	# For 1 row: center at 45px (original), for 3 rows: center middle row
+	var reel_height = visible_rows * SYMBOL_HEIGHT
+	var payline_offset = (reel_height / 2.0) - (SYMBOL_HEIGHT / 2.0)
 	strip.position.y = -visual_pos + payline_offset
 
 func _on_spin_pressed():
@@ -169,12 +194,14 @@ func _on_spin_pressed():
 
 	is_spinning = true
 	spin_time = 0.0
-	reels_stopped = [false]
 	spin_button.disabled = true
 	lever_button.disabled = true
 
-	# Reset position to beginning of strip
-	reel_positions[0] = 0.0
+	# Reset all reels
+	for i in range(num_reels):
+		reels_stopped[i] = false
+		reel_positions[i] = 0.0
+		reel_speeds[i] = BASE_SPEED + randf_range(-200, 200)
 
 	for strip in reel_strips:
 		strip.visible = true
@@ -182,9 +209,6 @@ func _on_spin_pressed():
 	# Play spin start sound and looping reel spin
 	sfx_spin_start.play()
 	sfx_reel_spin.play()
-
-	# Start spinning
-	reel_speeds[0] = BASE_SPEED + randf_range(-200, 200)
 
 func _stop_spin():
 	is_spinning = false
