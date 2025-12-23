@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://Scripts/SlotMachine.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/lever_spritesheet2_pixel.png" id="lever_spritesheet"]
@@ -8,6 +8,7 @@
 [ext_resource type="AudioStream" path="res://Audio/SFX/spin_start.mp3" id="audio_spin_start"]
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/casino_marker_bg.png" id="marker_bg"]
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/ChromeBackground.png" id="chrome_bg"]
+[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/tray.png" id="tray_texture"]
 
 [node name="Main" type="Node2D"]
 
@@ -17,6 +18,13 @@ offset_top = 0.0
 offset_right = 1920.0
 offset_bottom = 1080.0
 color = Color(0.94, 0.92, 0.84, 1)
+
+[node name="SlotTray" type="TextureRect" parent="."]
+offset_left = 649.0
+offset_top = 906.0
+offset_right = 1271.0
+offset_bottom = 1080.0
+texture = ExtResource("tray_texture")
 
 [node name="SlotMachine" type="Node2D" parent="."]
 position = Vector2(960, 540)
