@@ -1,14 +1,15 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://Scripts/SlotMachine.gd" id="1_script"]
+[ext_resource type="Script" path="res://Scripts/CoinAnimation.gd" id="coin_script"]
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/lever_spritesheet2_pixel.png" id="lever_spritesheet"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/reel_spin.mp3" id="audio_reel_spin"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/reel_stop.mp3" id="audio_reel_stop"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/slot_win.mp3" id="audio_slot_win"]
 [ext_resource type="AudioStream" path="res://Audio/SFX/spin_start.mp3" id="audio_spin_start"]
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/casino_marker_bg.png" id="marker_bg"]
-[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/ChromeBackground.png" id="chrome_bg"]
 [ext_resource type="Texture2D" path="res://Assets/SingleImages/output/tray.png" id="tray_texture"]
+[ext_resource type="Texture2D" path="res://Assets/SingleImages/output/gold_coin_strip.png" id="gold_coin"]
 
 [node name="Main" type="Node2D"]
 
@@ -25,6 +26,14 @@ offset_top = 906.0
 offset_right = 1271.0
 offset_bottom = 1080.0
 texture = ExtResource("tray_texture")
+
+[node name="GoldCoin" type="Sprite2D" parent="."]
+position = Vector2(960, 850)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("gold_coin")
+hframes = 144
+frame = 0
+script = ExtResource("coin_script")
 
 [node name="SlotMachine" type="Node2D" parent="."]
 position = Vector2(960, 540)
