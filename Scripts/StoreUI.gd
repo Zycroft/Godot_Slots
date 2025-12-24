@@ -2,29 +2,81 @@ extends Control
 
 # Loyalty Cashier store with shop dialog
 
+var teller_sprite: Sprite2D
 var shop_button: Button
 var restart_button: Button
 var shop_dialog: Control
+
+# Animation settings (13x12 grid sprite sheet with 156 frames)
+var teller_texture: Texture2D
+const FRAME_COUNT = 156
+const COLUMNS = 13
+const FRAME_WIDTH = 256
+const FRAME_HEIGHT = 256
+var current_frame: int = 0
+var animation_timer: float = 0.0
+const FRAME_DURATION = 0.12
 
 func _ready():
 	_build_shop_button()
 	_build_restart_button()
 	_build_shop_dialog()
 
+func _process(delta):
+	_animate_teller(delta)
+
+func _animate_teller(delta):
+	if teller_sprite == null:
+		return
+	animation_timer += delta
+	if animation_timer >= FRAME_DURATION:
+		animation_timer = 0.0
+		current_frame = (current_frame + 1) % FRAME_COUNT
+		@warning_ignore("integer_division")
+		var col: int = current_frame % COLUMNS
+		@warning_ignore("integer_division")
+		var row: int = current_frame / COLUMNS
+		teller_sprite.region_rect = Rect2(col * FRAME_WIDTH, row * FRAME_HEIGHT, FRAME_WIDTH, FRAME_HEIGHT)
+
 func _build_shop_button():
+	# Container for sprite and button
+	var container = Control.new()
+	container.name = "ShopContainer"
+	container.position = Vector2(-20, 50)
+	container.size = Vector2(128, 128)
+	add_child(container)
+
+	# Load and setup animated teller sprite
+	teller_texture = load("res://Assets/sprite_sheet_256_5px.png")
+	teller_sprite = Sprite2D.new()
+	teller_sprite.texture = teller_texture
+	teller_sprite.centered = false
+	teller_sprite.region_enabled = true
+	teller_sprite.region_rect = Rect2(0, 0, FRAME_WIDTH, FRAME_HEIGHT)
+	teller_sprite.scale = Vector2(0.5, 0.5)  # Scale 256x256 to 128x128
+	teller_sprite.position = Vector2(0, 0)
+	container.add_child(teller_sprite)
+
+	# Invisible button overlay
 	shop_button = Button.new()
-	shop_button.text = "Shop"
-	shop_button.custom_minimum_size = Vector2(140, 60)
-	shop_button.position = Vector2(-20, 200)
-	shop_button.add_theme_font_size_override("font_size", 18)
+	shop_button.flat = true
+	shop_button.custom_minimum_size = Vector2(128, 128)
+	shop_button.size = Vector2(128, 128)
+	shop_button.position = Vector2(0, 0)
+	shop_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	shop_button.pressed.connect(_open_shop)
-	add_child(shop_button)
+	var transparent_style = StyleBoxEmpty.new()
+	shop_button.add_theme_stylebox_override("normal", transparent_style)
+	shop_button.add_theme_stylebox_override("hover", transparent_style)
+	shop_button.add_theme_stylebox_override("pressed", transparent_style)
+	shop_button.add_theme_stylebox_override("focus", transparent_style)
+	container.add_child(shop_button)
 
 func _build_restart_button():
 	restart_button = Button.new()
 	restart_button.text = "Restart\nGame"
-	restart_button.custom_minimum_size = Vector2(140, 60)
-	restart_button.position = Vector2(-20, 280)
+	restart_button.custom_minimum_size = Vector2(128, 60)
+	restart_button.position = Vector2(-20, 190)
 	restart_button.add_theme_font_size_override("font_size", 16)
 	restart_button.pressed.connect(_on_restart_pressed)
 	add_child(restart_button)
