@@ -1,6 +1,7 @@
-[gd_scene load_steps=16 format=3 uid="uid://da6rsce4qix02"]
+[gd_scene load_steps=17 format=3 uid="uid://da6rsce4qix02"]
 
 [ext_resource type="Script" uid="uid://bq60j16f3yk7c" path="res://Scripts/SlotMachine.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://Assets/backgrounds/back1.jpeg" id="background_texture"]
 [ext_resource type="Texture2D" path="res://Assets/marker_anim.png" id="marker_anim_texture"]
 [ext_resource type="AudioStream" uid="uid://cu52qyur5i72n" path="res://Audio/SFX/reel_spin.mp3" id="audio_reel_spin"]
 [ext_resource type="AudioStream" uid="uid://c481xrusrh116" path="res://Audio/SFX/reel_stop.mp3" id="audio_reel_stop"]
@@ -20,10 +21,12 @@
 
 [node name="Main" type="Node2D"]
 
-[node name="SceneBackground" type="ColorRect" parent="."]
+[node name="SceneBackground" type="TextureRect" parent="."]
 offset_right = 1920.0
 offset_bottom = 1080.0
-color = Color(0.94, 0.92, 0.84, 1)
+texture = ExtResource("background_texture")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="SlotTray" type="TextureRect" parent="."]
 offset_left = 649.0
