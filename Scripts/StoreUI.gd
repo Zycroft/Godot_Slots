@@ -7,15 +7,23 @@ var shop_button: Button
 var restart_button: Button
 var shop_dialog: Control
 
-# Animation settings (13x12 grid sprite sheet with 156 frames)
-var teller_texture: Texture2D
-const FRAME_COUNT = 156
-const COLUMNS = 13
+# Animation settings (8x7 grid sprite sheets with 56 frames each)
+var teller_textures: Array[Texture2D] = []
+var idle_texture: Texture2D
+var current_texture_index: int = 0
+const FRAME_COUNT = 50  # Skip last 6 frames which may be blank
+const COLUMNS = 8
 const FRAME_WIDTH = 256
 const FRAME_HEIGHT = 256
 var current_frame: int = 0
 var animation_timer: float = 0.0
 const FRAME_DURATION = 0.12
+
+# Idle transition state
+var in_idle: bool = false
+var idle_frames_remaining: int = 0
+const MIN_IDLE_FRAMES = 15
+const MAX_IDLE_FRAMES = 40
 
 func _ready():
 	_build_shop_button()
@@ -28,15 +36,51 @@ func _process(delta):
 func _animate_teller(delta):
 	if teller_sprite == null:
 		return
+
 	animation_timer += delta
 	if animation_timer >= FRAME_DURATION:
 		animation_timer = 0.0
-		current_frame = (current_frame + 1) % FRAME_COUNT
+		current_frame += 1
+
+		if in_idle:
+			# Playing idle animation between main animations
+			idle_frames_remaining -= 1
+			if idle_frames_remaining <= 0:
+				# Done with idle, start next main animation
+				_start_next_animation()
+			elif current_frame >= FRAME_COUNT:
+				# Loop idle animation if needed
+				current_frame = 0
+		else:
+			# Playing main animation
+			if current_frame >= FRAME_COUNT:
+				# Main animation done, switch to idle
+				_start_idle()
+
+		# Always update sprite region for current frame (no early returns)
 		@warning_ignore("integer_division")
 		var col: int = current_frame % COLUMNS
 		@warning_ignore("integer_division")
 		var row: int = current_frame / COLUMNS
 		teller_sprite.region_rect = Rect2(col * FRAME_WIDTH, row * FRAME_HEIGHT, FRAME_WIDTH, FRAME_HEIGHT)
+
+func _start_idle():
+	in_idle = true
+	current_frame = 0
+	idle_frames_remaining = randi_range(MIN_IDLE_FRAMES, MAX_IDLE_FRAMES)
+	# Switch to idle texture and force immediate display of frame 0
+	teller_sprite.texture = idle_texture
+	teller_sprite.region_rect = Rect2(0, 0, FRAME_WIDTH, FRAME_HEIGHT)
+	teller_sprite.queue_redraw()
+
+func _start_next_animation():
+	in_idle = false
+	current_frame = 0
+	current_texture_index = randi() % teller_textures.size()
+	# Switch texture and force immediate display of frame 0
+	teller_sprite.texture = teller_textures[current_texture_index]
+	teller_sprite.region_rect = Rect2(0, 0, FRAME_WIDTH, FRAME_HEIGHT)
+	teller_sprite.queue_redraw()
 
 func _build_shop_button():
 	# Container for sprite and button
@@ -46,10 +90,20 @@ func _build_shop_button():
 	container.size = Vector2(128, 128)
 	add_child(container)
 
-	# Load and setup animated teller sprite
-	teller_texture = load("res://Assets/sprite_sheet_256_5px.png")
+	# Load all 3 cashier animation textures
+	teller_textures.append(load("res://Assets/cashierbook_anim.png"))
+	teller_textures.append(load("res://Assets/cashiersleep_anim.png"))
+	teller_textures.append(load("res://Assets/cashiersmile_anim.png"))
+
+	# Load idle animation texture
+	idle_texture = load("res://Assets/cashieridle_anim.png")
+
+	# Pick a random starting animation
+	current_texture_index = randi() % teller_textures.size()
+
+	# Setup animated teller sprite (single sprite for both animation and transition)
 	teller_sprite = Sprite2D.new()
-	teller_sprite.texture = teller_texture
+	teller_sprite.texture = teller_textures[current_texture_index]
 	teller_sprite.centered = false
 	teller_sprite.region_enabled = true
 	teller_sprite.region_rect = Rect2(0, 0, FRAME_WIDTH, FRAME_HEIGHT)
