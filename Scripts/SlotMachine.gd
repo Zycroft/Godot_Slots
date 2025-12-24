@@ -3,6 +3,7 @@ extends Node2D
 # Reel container reference
 @onready var reel_container: HBoxContainer = $ReelContainer
 @onready var reel_background: Panel = $ReelBackground
+@onready var flame_effect: Sprite2D = $FlameEffect
 
 @onready var spin_button: Button = $SpinButton
 @onready var credits_label: Label = $CreditsLabel
@@ -19,6 +20,7 @@ extends Node2D
 @onready var sfx_reel_spin: AudioStreamPlayer = $SFX/ReelSpin
 @onready var sfx_reel_stop: AudioStreamPlayer = $SFX/ReelStop
 @onready var sfx_slot_win: AudioStreamPlayer = $SFX/SlotWin
+@onready var sfx_fire_crackle: AudioStreamPlayer = $SFX/FireCrackle
 
 # Constants
 const WRAP_BUFFER: int = 3
@@ -328,6 +330,9 @@ func _stop_spin():
 	spin_button.disabled = false
 	lever_button.disabled = false
 
+	# Play flame eruption effect
+	_play_flame_effect()
+
 	# Spawn coins when spin stops
 	_spawn_coins()
 
@@ -352,6 +357,30 @@ func _spawn_coins():
 
 		# Remove coin after animation finishes
 		get_tree().create_timer(delay + 2.0).timeout.connect(coin.queue_free)
+
+func _play_flame_effect():
+	# Position flame at top of reel frame
+	flame_effect.position.y = reel_background.offset_top
+	flame_effect.frame = 0
+	flame_effect.visible = true
+	flame_effect.modulate.a = 1.0
+
+	# Play fire crackle sound
+	sfx_fire_crackle.play()
+
+	# Animate through 14 frames (7 columns x 2 rows) - doubled duration
+	var tween = create_tween()
+	for i in range(14):
+		tween.tween_property(flame_effect, "frame", i, 0.24)
+
+	# Fade out at the end
+	tween.tween_property(flame_effect, "modulate:a", 0.0, 1.2)
+	tween.parallel().tween_property(sfx_fire_crackle, "volume_db", -40.0, 1.2)
+	tween.tween_callback(func():
+		flame_effect.visible = false
+		sfx_fire_crackle.stop()
+		sfx_fire_crackle.volume_db = 0.0
+	)
 
 func _update_credits_display():
 	credits_label.text = "Credits: " + str(GameConfig.credits)
