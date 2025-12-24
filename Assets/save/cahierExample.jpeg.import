@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dcdw3if161qav"
-path="res://.godot/imported/Chrome backPlate.png-0edf9261ab4ece54adaa950ad2e0b120.ctex"
+uid="uid://bnu1j58hs3nvt"
+path="res://.godot/imported/cahierExample.jpeg-ed82e2eb23e877ac4f77b3390be4f1f2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/save/Chrome backPlate.png"
-dest_files=["res://.godot/imported/Chrome backPlate.png-0edf9261ab4ece54adaa950ad2e0b120.ctex"]
+source_file="res://Assets/save/cahierExample.jpeg"
+dest_files=["res://.godot/imported/cahierExample.jpeg-ed82e2eb23e877ac4f77b3390be4f1f2.ctex"]
 
 [params]
 

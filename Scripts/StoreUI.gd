@@ -1,29 +1,30 @@
 extends Control
 
-# Loyalty Cashier button that opens the shop dialog
+# Loyalty Cashier store with shop dialog
 
-var cashier_button: Button
+var shop_button: Button
 var restart_button: Button
 var shop_dialog: Control
 
 func _ready():
-	_build_cashier_button()
+	_build_shop_button()
 	_build_restart_button()
 	_build_shop_dialog()
 
-func _build_cashier_button():
-	cashier_button = Button.new()
-	cashier_button.text = "Loyalty\nCashier"
-	cashier_button.custom_minimum_size = Vector2(140, 80)
-	cashier_button.add_theme_font_size_override("font_size", 18)
-	cashier_button.pressed.connect(_open_shop)
-	add_child(cashier_button)
+func _build_shop_button():
+	shop_button = Button.new()
+	shop_button.text = "Shop"
+	shop_button.custom_minimum_size = Vector2(140, 60)
+	shop_button.position = Vector2(-20, 200)
+	shop_button.add_theme_font_size_override("font_size", 18)
+	shop_button.pressed.connect(_open_shop)
+	add_child(shop_button)
 
 func _build_restart_button():
 	restart_button = Button.new()
 	restart_button.text = "Restart\nGame"
 	restart_button.custom_minimum_size = Vector2(140, 60)
-	restart_button.position = Vector2(0, 100)
+	restart_button.position = Vector2(-20, 280)
 	restart_button.add_theme_font_size_override("font_size", 16)
 	restart_button.pressed.connect(_on_restart_pressed)
 	add_child(restart_button)
@@ -64,7 +65,7 @@ func _setup_dialog_content():
 	panel.name = "DialogPanel"
 	panel.custom_minimum_size = Vector2(500, 400)
 	panel.size = Vector2(500, 400)
-	panel.position = Vector2((1920 - 500) / 2, (1080 - 400) / 2)
+	panel.position = Vector2((1920 - 500) / 2.0, (1080 - 400) / 2.0)
 
 	var style = StyleBoxFlat.new()
 	style.bg_color = Color(0.15, 0.15, 0.2, 1)

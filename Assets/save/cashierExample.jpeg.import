@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cdl4utrpiw5l5"
-path="res://.godot/imported/Cherry.png-b952eb03b4fc2a2b9316deb6ddd46911.ctex"
+uid="uid://rfqrxlhkuuvo"
+path="res://.godot/imported/cashierExample.jpeg-ea295069a128781b5b65f536192dd59e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/save/Cherry.png"
-dest_files=["res://.godot/imported/Cherry.png-b952eb03b4fc2a2b9316deb6ddd46911.ctex"]
+source_file="res://Assets/save/cashierExample.jpeg"
+dest_files=["res://.godot/imported/cashierExample.jpeg-ea295069a128781b5b65f536192dd59e.ctex"]
 
 [params]
 
