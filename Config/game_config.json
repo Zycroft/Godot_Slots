@@ -17,7 +17,69 @@
 		"lemon": { "3": 8, "4": 20, "5": 75 },
 		"grape": { "3": 10, "4": 30, "5": 100 },
 		"creature": { "3": 25, "4": 75, "5": 200 },
-		"red7": { "3": 50, "4": 150, "5": 500 }
+		"red7": { "3": 50, "4": 150, "5": 500 },
+		"wild": { "3": 100, "4": 300, "5": 1000 },
+		"multiplier2x": { "1": 0 }
+	},
+	"reel_objects": {
+		"cherry": {
+			"id": "cherry",
+			"name": "Cherry",
+			"type": "standard",
+			"rarity": "common",
+			"texture": "res://Assets/SingleImages/output/Cherry.png",
+			"payouts": { "3": 5, "4": 15, "5": 50 }
+		},
+		"lemon": {
+			"id": "lemon",
+			"name": "Lemon",
+			"type": "standard",
+			"rarity": "common",
+			"texture": "res://Assets/SingleImages/output/Lemon.png",
+			"payouts": { "3": 8, "4": 20, "5": 75 }
+		},
+		"grape": {
+			"id": "grape",
+			"name": "Grape",
+			"type": "standard",
+			"rarity": "common",
+			"texture": "res://Assets/SingleImages/output/Grape.png",
+			"payouts": { "3": 10, "4": 30, "5": 100 }
+		},
+		"creature": {
+			"id": "creature",
+			"name": "Creature",
+			"type": "standard",
+			"rarity": "uncommon",
+			"texture": "res://Assets/SingleImages/output/Creature.png",
+			"payouts": { "3": 25, "4": 75, "5": 200 }
+		},
+		"red7": {
+			"id": "red7",
+			"name": "Red 7",
+			"type": "standard",
+			"rarity": "rare",
+			"texture": "res://Assets/SingleImages/output/Red7.png",
+			"payouts": { "3": 50, "4": 150, "5": 500 }
+		},
+		"wild": {
+			"id": "wild",
+			"name": "Wild Star",
+			"type": "wild",
+			"rarity": "epic",
+			"texture": "res://Assets/SingleImages/output/Red7.png",
+			"payouts": { "3": 100, "4": 300, "5": 1000 },
+			"wild_excludes": []
+		},
+		"multiplier2x": {
+			"id": "multiplier2x",
+			"name": "2x Multiplier",
+			"type": "multiplier",
+			"rarity": "rare",
+			"texture": "res://Assets/SingleImages/output/Red7.png",
+			"multiplier": 2.0,
+			"single_payout": 5
+		}
 	},
 	"reels": [
 		{

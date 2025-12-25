@@ -1,6 +1,9 @@
 extends Panel
 class_name PayoutDisplay
 
+# Preload ReelObject class
+const ReelObjectClass = preload("res://Scripts/ReelObject.gd")
+
 # Container for payout entries
 var payout_container: HBoxContainer
 
@@ -80,6 +83,7 @@ func _create_payout_entry(symbol_name: String, symbol_payouts: Dictionary) -> Co
 		return null
 
 	var payouts = symbol_payouts[symbol_name]
+	var reel_obj = GameConfig.get_reel_object(symbol_name)
 
 	# Container for this entry
 	var entry = HBoxContainer.new()
@@ -95,13 +99,38 @@ func _create_payout_entry(symbol_name: String, symbol_payouts: Dictionary) -> Co
 
 	# Payout text (show 3-match payout)
 	var label = Label.new()
-	label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4, 1.0))
 	label.add_theme_font_size_override("font_size", 20)
 
-	# Format: "x3=5 x4=15 x5=50" or just "x3=5" for compact view
+	# Determine text color based on rarity or special type
+	var text_color = Color(1.0, 0.9, 0.4, 1.0)  # Default gold
 	var payout_text = ""
-	if payouts.has("3"):
-		payout_text = "x3=" + str(payouts["3"])
+
+	if reel_obj:
+		text_color = reel_obj.get_rarity_color()
+
+		# Special symbol type display
+		match reel_obj.type:
+			ReelObjectClass.Type.WILD:
+				payout_text = "WILD"
+				text_color = Color(0.9, 0.3, 0.9, 1.0)  # Purple for wild
+			ReelObjectClass.Type.MULTIPLIER:
+				payout_text = "x" + str(reel_obj.multiplier_value)
+				text_color = Color(0.3, 0.9, 0.3, 1.0)  # Green for multiplier
+			ReelObjectClass.Type.FREE_SPIN:
+				payout_text = "FREE"
+				text_color = Color(0.3, 0.8, 1.0, 1.0)  # Cyan for free spin
+			ReelObjectClass.Type.SHOP_KEY:
+				payout_text = "SHOP"
+				text_color = Color(1.0, 0.6, 0.2, 1.0)  # Orange for shop
+			_:
+				if payouts.has("3"):
+					payout_text = "x3=" + str(payouts["3"])
+	else:
+		# Fallback for symbols without reel_object data
+		if payouts.has("3"):
+			payout_text = "x3=" + str(payouts["3"])
+
+	label.add_theme_color_override("font_color", text_color)
 	label.text = payout_text
 
 	entry.add_child(label)

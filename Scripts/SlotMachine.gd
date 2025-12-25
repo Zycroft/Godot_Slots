@@ -49,6 +49,9 @@ var final_symbols: Array = []
 var lever_start_pos: Vector2
 var is_lever_pulling: bool = false
 
+# Free spin state
+var free_spins_remaining: int = 0
+
 # Preloaded scripts
 var grid_overlay_script = preload("res://Scripts/GridOverlay.gd")
 var coin_script = preload("res://Scripts/CoinAnimation.gd")
@@ -354,11 +357,20 @@ func _get_visible_symbols() -> Array:
 func _on_spin_pressed():
 	if not GameConfig.game_started:
 		return
-	if is_spinning or GameConfig.credits < GameConfig.spin_cost or GameConfig.hours_remaining < GameConfig.hours_per_spin:
-		return
 
-	GameConfig.credits -= GameConfig.spin_cost
-	GameConfig.hours_remaining -= GameConfig.hours_per_spin
+	# Check if we can spin (free spin or have enough credits/time)
+	var using_free_spin = free_spins_remaining > 0
+	if not using_free_spin:
+		if is_spinning or GameConfig.credits < GameConfig.spin_cost or GameConfig.hours_remaining < GameConfig.hours_per_spin:
+			return
+		GameConfig.credits -= GameConfig.spin_cost
+		GameConfig.hours_remaining -= GameConfig.hours_per_spin
+	else:
+		if is_spinning:
+			return
+		free_spins_remaining -= 1
+		print("Free spin used! %d remaining" % free_spins_remaining)
+
 	_update_credits_display()
 	_update_hud()
 
@@ -389,6 +401,12 @@ func _stop_spin():
 	var visible_symbols = _get_visible_symbols()
 	var wins = WinChecker.check_wins(visible_symbols, GameConfig.paylines, GameConfig.symbol_payouts)
 	var total_payout = WinChecker.calculate_total_payout(wins)
+
+	# Check for free spin symbols
+	var free_spin_count = WinChecker.check_free_spins(visible_symbols)
+	if free_spin_count > 0:
+		free_spins_remaining += free_spin_count
+		print("Free spins awarded: %d (total: %d)" % [free_spin_count, free_spins_remaining])
 
 	# Award winnings
 	if total_payout > 0:

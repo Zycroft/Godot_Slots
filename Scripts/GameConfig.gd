@@ -1,5 +1,8 @@
 extends Node
 
+# Preload ReelObject class
+const ReelObjectClass = preload("res://Scripts/ReelObject.gd")
+
 # Signals
 signal config_changed
 signal card_purchased(card_id: String)
@@ -21,6 +24,12 @@ var symbols: Dictionary = {}
 
 # Symbol payouts (symbol_name -> { "3": payout, "4": payout, "5": payout })
 var symbol_payouts: Dictionary = {}
+
+# Reel objects (symbol_name -> ReelObject data dictionary)
+var reel_objects: Dictionary = {}
+
+# Cached ReelObject instances
+var _reel_object_cache: Dictionary = {}
 
 # Reel configurations (array of symbol names per reel)
 var reels: Array = []
@@ -138,6 +147,11 @@ func _apply_config(data: Dictionary):
 	if data.has("symbol_payouts"):
 		symbol_payouts = data["symbol_payouts"]
 
+	# Apply reel objects
+	if data.has("reel_objects"):
+		reel_objects = data["reel_objects"]
+		_load_reel_objects()
+
 	# Apply reels
 	if data.has("reels"):
 		reels = data["reels"]
@@ -169,10 +183,47 @@ func _load_symbol_textures():
 		else:
 			push_warning("Failed to load symbol texture: " + path)
 
+func _load_reel_objects():
+	_reel_object_cache.clear()
+	for obj_id in reel_objects:
+		var obj_data = reel_objects[obj_id]
+		var reel_obj = ReelObjectClass.from_dict(obj_data)
+		_reel_object_cache[obj_id] = reel_obj
+
+		# Also load texture into symbols cache if not already there
+		if not symbols.has(obj_id) and obj_data.has("texture"):
+			symbols[obj_id] = obj_data["texture"]
+			var texture = load(obj_data["texture"])
+			if texture:
+				_symbol_textures[obj_id] = texture
+
 func get_symbol_texture(symbol_name: String) -> Texture2D:
 	if _symbol_textures.has(symbol_name):
 		return _symbol_textures[symbol_name]
 	return null
+
+func get_reel_object(symbol_id: String):
+	if _reel_object_cache.has(symbol_id):
+		return _reel_object_cache[symbol_id]
+	return null
+
+func is_wild(symbol_id: String) -> bool:
+	var obj = get_reel_object(symbol_id)
+	if obj:
+		return obj.is_wild
+	return false
+
+func get_multiplier(symbol_id: String) -> float:
+	var obj = get_reel_object(symbol_id)
+	if obj and obj.type == ReelObjectClass.Type.MULTIPLIER:
+		return obj.multiplier_value
+	return 1.0
+
+func is_free_spin(symbol_id: String) -> bool:
+	var obj = get_reel_object(symbol_id)
+	if obj:
+		return obj.type == ReelObjectClass.Type.FREE_SPIN
+	return false
 
 func get_reel_symbols(reel_index: int) -> Array:
 	if reel_index < reels.size():
