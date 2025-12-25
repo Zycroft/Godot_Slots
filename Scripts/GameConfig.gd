@@ -2,11 +2,13 @@ extends Node
 
 # Preload ReelObject class
 const ReelObjectClass = preload("res://Scripts/ReelObject.gd")
+const CurrencyManagerClass = preload("res://Scripts/CurrencyManager.gd")
 
 # Signals
 signal config_changed
 signal card_purchased(card_id: String)
 signal game_reset
+signal currency_changed(currency_type: String, new_amount: int)
 
 # Config file path
 const CONFIG_PATH = "res://Config/game_config.json"
@@ -38,10 +40,23 @@ var reels: Array = []
 var paylines: Array = []
 
 # Game state
-var credits: int = 100
+var credits: int = 100  # Legacy - use casino_coins instead
 var hours_remaining: float = 8.0
 var spin_cost: int = 1
 var hours_per_spin: float = 0.5
+
+# Triple Currency System
+var currency_manager: CurrencyManagerClass = null
+var casino_coins: int:
+	get: return currency_manager.casino_coins if currency_manager else 0
+	set(value):
+		if currency_manager:
+			currency_manager.casino_coins = value
+			currency_manager.currency_changed.emit("casino_coins", value)
+var gold_nuggets: int:
+	get: return currency_manager.gold_nuggets if currency_manager else 0
+var gold_bars: int:
+	get: return currency_manager.gold_bars if currency_manager else 0
 
 # Loyalty Card System
 var owned_cards: Array = []
@@ -98,6 +113,9 @@ const CARD_DEFINITIONS = {
 var _symbol_textures: Dictionary = {}
 
 func _ready():
+	# Initialize currency manager
+	currency_manager = CurrencyManagerClass.new()
+	currency_manager.currency_changed.connect(_on_currency_changed)
 	load_config()
 
 func load_config(path: String = CONFIG_PATH) -> bool:
@@ -284,6 +302,11 @@ func start_game(difficulty: String) -> void:
 	card_cost_multiplier = diff["card_cost_multiplier"]
 	owned_cards.clear()
 	game_started = true
+
+	# Initialize currency with starting credits
+	if currency_manager:
+		currency_manager.reset_all()
+		currency_manager.casino_coins = credits
 	config_changed.emit()
 
 func get_card_cost(card_id: String) -> int:
@@ -311,8 +334,53 @@ func buy_card(card_id: String) -> bool:
 func get_card_count(card_id: String) -> int:
 	return owned_cards.count(card_id)
 
+# Currency system methods
+func _on_currency_changed(currency_type: String, new_amount: int) -> void:
+	currency_changed.emit(currency_type, new_amount)
+	# Keep legacy credits in sync with casino_coins
+	if currency_type == "casino_coins":
+		credits = new_amount
+
+func add_casino_coins(amount: int) -> void:
+	if currency_manager:
+		currency_manager.add_currency(CurrencyManagerClass.CurrencyType.CASINO_COINS, amount)
+		credits = currency_manager.casino_coins
+
+func spend_casino_coins(amount: int) -> bool:
+	if currency_manager:
+		var success = currency_manager.spend_currency(CurrencyManagerClass.CurrencyType.CASINO_COINS, amount)
+		if success:
+			credits = currency_manager.casino_coins
+		return success
+	return false
+
+func can_convert_coins_to_nuggets(count: int = 1) -> bool:
+	return currency_manager.can_convert_coins_to_nuggets(count) if currency_manager else false
+
+func can_convert_nuggets_to_bars(count: int = 1) -> bool:
+	return currency_manager.can_convert_nuggets_to_bars(count) if currency_manager else false
+
+func convert_coins_to_nuggets(count: int = 1) -> bool:
+	if currency_manager:
+		var success = currency_manager.convert_coins_to_nuggets(count)
+		if success:
+			credits = currency_manager.casino_coins
+		return success
+	return false
+
+func convert_nuggets_to_bars(count: int = 1) -> bool:
+	return currency_manager.convert_nuggets_to_bars(count) if currency_manager else false
+
+func get_max_nuggets_convertible() -> int:
+	return currency_manager.get_max_nuggets_from_coins() if currency_manager else 0
+
+func get_max_bars_convertible() -> int:
+	return currency_manager.get_max_bars_from_nuggets() if currency_manager else 0
+
 func reset_game() -> void:
 	game_started = false
 	owned_cards.clear()
+	if currency_manager:
+		currency_manager.reset_all()
 	load_config()  # Reload original config
 	game_reset.emit()

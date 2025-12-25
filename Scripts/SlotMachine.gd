@@ -56,9 +56,18 @@ var free_spins_remaining: int = 0
 var grid_overlay_script = preload("res://Scripts/GridOverlay.gd")
 var coin_script = preload("res://Scripts/CoinAnimation.gd")
 var payout_display_script = preload("res://Scripts/PayoutDisplay.gd")
+var currency_converter_script = preload("res://Scripts/CurrencyConverter.gd")
 
 # Payout display reference
 var payout_display: Panel
+
+# Currency converter
+var currency_converter: Panel
+var currency_button: Button
+var currency_hud: Control
+var coins_value_label: Label
+var nuggets_value_label: Label
+var bars_value_label: Label
 
 # Coin spawning
 var coin_texture: Texture2D
@@ -99,6 +108,9 @@ func _ready():
 
 	# Create payout display above reels
 	_create_payout_display()
+
+	# Create currency HUD and converter
+	_create_currency_ui()
 
 func _on_config_changed():
 	# Rebuild reels when config changes (only if not spinning)
@@ -190,6 +202,139 @@ func _create_payout_display():
 	payout_display.offset_bottom = bg_top - 200
 
 	add_child(payout_display)
+
+func _create_currency_ui():
+	# Get the HUD layer
+	var hud = get_node_or_null("../HUD")
+	if not hud:
+		return
+
+	# Create currency HUD panel on the right side
+	currency_hud = Panel.new()
+	currency_hud.name = "CurrencyHUD"
+	currency_hud.offset_left = 1720
+	currency_hud.offset_top = 480
+	currency_hud.offset_right = 1900
+	currency_hud.offset_bottom = 700
+
+	var hud_style = StyleBoxFlat.new()
+	hud_style.bg_color = Color(0.1, 0.1, 0.15, 0.9)
+	hud_style.border_width_left = 2
+	hud_style.border_width_top = 2
+	hud_style.border_width_right = 2
+	hud_style.border_width_bottom = 2
+	hud_style.border_color = Color(0.6, 0.5, 0.2, 1.0)
+	hud_style.corner_radius_top_left = 8
+	hud_style.corner_radius_top_right = 8
+	hud_style.corner_radius_bottom_left = 8
+	hud_style.corner_radius_bottom_right = 8
+	currency_hud.add_theme_stylebox_override("panel", hud_style)
+	hud.add_child(currency_hud)
+
+	var vbox = VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 8)
+	vbox.offset_left = 10
+	vbox.offset_right = -10
+	vbox.offset_top = 10
+	vbox.offset_bottom = -10
+	currency_hud.add_child(vbox)
+
+	# Title
+	var title = Label.new()
+	title.text = "Currency"
+	title.add_theme_font_size_override("font_size", 18)
+	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title)
+
+	# Coins row
+	var coins_row_data = _create_currency_row("Coins:", Color(1.0, 0.85, 0.3))
+	vbox.add_child(coins_row_data.row)
+	coins_value_label = coins_row_data.value
+
+	# Nuggets row
+	var nuggets_row_data = _create_currency_row("Nuggets:", Color(1.0, 0.65, 0.2))
+	vbox.add_child(nuggets_row_data.row)
+	nuggets_value_label = nuggets_row_data.value
+
+	# Bars row
+	var bars_row_data = _create_currency_row("Bars:", Color(1.0, 0.45, 0.1))
+	vbox.add_child(bars_row_data.row)
+	bars_value_label = bars_row_data.value
+
+	# Spacer
+	var spacer = Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+
+	# Exchange button
+	currency_button = Button.new()
+	currency_button.text = "Exchange"
+	currency_button.custom_minimum_size = Vector2(0, 35)
+	currency_button.pressed.connect(_on_currency_button_pressed)
+	vbox.add_child(currency_button)
+
+	# Create currency converter dialog (hidden by default)
+	currency_converter = Panel.new()
+	currency_converter.set_script(currency_converter_script)
+	currency_converter.name = "CurrencyConverter"
+	currency_converter.visible = false
+	currency_converter.set_anchors_preset(Control.PRESET_CENTER)
+	currency_converter.offset_left = -225
+	currency_converter.offset_right = 225
+	currency_converter.offset_top = -200
+	currency_converter.offset_bottom = 200
+	currency_converter.closed.connect(_on_currency_converter_closed)
+	hud.add_child(currency_converter)
+
+	# Connect to currency changes
+	GameConfig.currency_changed.connect(_on_currency_value_changed)
+
+	# Initial update
+	_update_currency_hud()
+
+func _create_currency_row(label_text: String, color: Color) -> Dictionary:
+	var row = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 5)
+
+	var label = Label.new()
+	label.text = label_text
+	label.add_theme_font_size_override("font_size", 14)
+	label.add_theme_color_override("font_color", color)
+	label.custom_minimum_size = Vector2(70, 0)
+	row.add_child(label)
+
+	var value = Label.new()
+	value.text = "0"
+	value.add_theme_font_size_override("font_size", 16)
+	value.add_theme_color_override("font_color", Color.WHITE)
+	value.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	row.add_child(value)
+
+	return {"row": row, "value": value}
+
+func _update_currency_hud():
+	if not currency_hud or not is_instance_valid(currency_hud):
+		return
+
+	if coins_value_label and is_instance_valid(coins_value_label):
+		coins_value_label.text = str(GameConfig.casino_coins)
+	if nuggets_value_label and is_instance_valid(nuggets_value_label):
+		nuggets_value_label.text = str(GameConfig.gold_nuggets)
+	if bars_value_label and is_instance_valid(bars_value_label):
+		bars_value_label.text = str(GameConfig.gold_bars)
+
+func _on_currency_button_pressed():
+	if currency_converter and is_instance_valid(currency_converter):
+		currency_converter.show_dialog()
+
+func _on_currency_converter_closed():
+	pass  # Dialog handles its own visibility
+
+func _on_currency_value_changed(_currency_type: String, _new_amount: int):
+	_update_currency_hud()
 
 func _create_reel(reel_index: int, width: float, height: float, num_slots: int):
 	# Create Panel
@@ -361,9 +506,9 @@ func _on_spin_pressed():
 	# Check if we can spin (free spin or have enough credits/time)
 	var using_free_spin = free_spins_remaining > 0
 	if not using_free_spin:
-		if is_spinning or GameConfig.credits < GameConfig.spin_cost or GameConfig.hours_remaining < GameConfig.hours_per_spin:
+		if is_spinning or GameConfig.casino_coins < GameConfig.spin_cost or GameConfig.hours_remaining < GameConfig.hours_per_spin:
 			return
-		GameConfig.credits -= GameConfig.spin_cost
+		GameConfig.spend_casino_coins(GameConfig.spin_cost)
 		GameConfig.hours_remaining -= GameConfig.hours_per_spin
 	else:
 		if is_spinning:
@@ -373,6 +518,7 @@ func _on_spin_pressed():
 
 	_update_credits_display()
 	_update_hud()
+	_update_currency_hud()
 
 	is_spinning = true
 	spin_time = 0.0
@@ -410,9 +556,10 @@ func _stop_spin():
 
 	# Award winnings
 	if total_payout > 0:
-		GameConfig.credits += total_payout
+		GameConfig.add_casino_coins(total_payout)
 		_update_credits_display()
 		_update_hud()
+		_update_currency_hud()
 
 		# Play win effects
 		_play_flame_effect()
@@ -494,7 +641,7 @@ func _on_lever_clicked():
 		return
 	if is_spinning or is_lever_pulling or lever_button.disabled:
 		return
-	if GameConfig.credits < GameConfig.spin_cost or GameConfig.hours_remaining < GameConfig.hours_per_spin:
+	if GameConfig.casino_coins < GameConfig.spin_cost or GameConfig.hours_remaining < GameConfig.hours_per_spin:
 		return
 
 	is_lever_pulling = true
