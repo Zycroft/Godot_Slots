@@ -4,6 +4,7 @@ extends Node
 const ReelObjectClass = preload("res://Scripts/ReelObject.gd")
 const CurrencyManagerClass = preload("res://Scripts/CurrencyManager.gd")
 const DayManagerClass = preload("res://Scripts/DayManager.gd")
+const LoyaltyShopManagerClass = preload("res://Scripts/LoyaltyShopManager.gd")
 
 # Signals
 signal config_changed
@@ -13,6 +14,9 @@ signal currency_changed(currency_type: String, new_amount: int)
 signal day_started(day_number: int, marker_amount: int)
 signal day_ended(day_number: int, success: bool, coins_earned: int)
 signal marker_progress_updated(current_coins: int, marker_amount: int)
+signal shop_opened
+signal shop_closed
+signal loyalty_card_activated(card_id: String)
 
 # Config file path
 const CONFIG_PATH = "res://Config/game_config.json"
@@ -67,9 +71,14 @@ var day_manager: DayManagerClass = null
 var current_day: int:
 	get: return day_manager.current_day if day_manager else 1
 var marker_amount: int:
-	get: return day_manager.marker_amount if day_manager else 0
+	get: return _get_adjusted_marker()
 
-# Loyalty Card System
+# Loyalty Shop System
+var shop_manager: LoyaltyShopManagerClass = null
+var is_shop_open: bool:
+	get: return shop_manager.shop_open if shop_manager else false
+
+# Loyalty Card System (legacy - use shop_manager)
 var owned_cards: Array = []
 var card_cost_multiplier: float = 1.0
 
@@ -133,6 +142,12 @@ func _ready():
 	day_manager.day_started.connect(_on_day_started)
 	day_manager.day_ended.connect(_on_day_ended)
 	day_manager.marker_updated.connect(_on_marker_updated)
+
+	# Initialize loyalty shop manager
+	shop_manager = LoyaltyShopManagerClass.new()
+	shop_manager.shop_opened.connect(_on_shop_opened)
+	shop_manager.shop_closed.connect(_on_shop_closed)
+	shop_manager.card_activated.connect(_on_loyalty_card_activated)
 
 	load_config()
 
@@ -409,6 +424,8 @@ func reset_game() -> void:
 		currency_manager.reset_all()
 	if day_manager:
 		day_manager.reset()
+	if shop_manager:
+		shop_manager.reset()
 	load_config()  # Reload original config
 	game_reset.emit()
 
@@ -422,11 +439,52 @@ func _on_day_ended(day_number: int, success: bool, coins_earned: int) -> void:
 func _on_marker_updated(current_coins: int, marker: int) -> void:
 	marker_progress_updated.emit(current_coins, marker)
 
+# Shop manager signal handlers
+func _on_shop_opened() -> void:
+	shop_opened.emit()
+
+func _on_shop_closed() -> void:
+	shop_closed.emit()
+
+func _on_loyalty_card_activated(card) -> void:
+	loyalty_card_activated.emit(card.id)
+	config_changed.emit()
+
+# Adjusted marker with card bonuses
+func _get_adjusted_marker() -> int:
+	var base_marker = day_manager.marker_amount if day_manager else 0
+	if shop_manager:
+		return shop_manager.get_adjusted_marker(base_marker)
+	return base_marker
+
+# Get effective num_reels with card bonuses
+func get_effective_num_reels() -> int:
+	if shop_manager:
+		return shop_manager.get_total_reels(num_reels)
+	return num_reels
+
+# Get effective visible_rows with card bonuses
+func get_effective_visible_rows() -> int:
+	if shop_manager:
+		return shop_manager.get_total_paylines(visible_rows)
+	return visible_rows
+
+# Get adjusted payout with multipliers
+func get_adjusted_payout(base_payout: int) -> int:
+	if shop_manager:
+		return shop_manager.get_adjusted_payout(base_payout)
+	return base_payout
+
 # Day system methods
 func use_time(hours: float) -> bool:
 	if day_manager:
 		hours_remaining -= hours
 		var can_continue = day_manager.use_time(hours)
+
+		# Check shop availability
+		if shop_manager:
+			shop_manager.check_shop_availability(hours_remaining)
+
 		if not can_continue:
 			_handle_day_end()
 			return false
@@ -454,6 +512,11 @@ func start_next_day() -> void:
 	# Advance to next day
 	day_manager.advance_day()
 	hours_remaining = day_manager.hours_remaining
+
+	# Apply bonus hours from cards and setup shop availability
+	if shop_manager:
+		hours_remaining += shop_manager.get_bonus_hours()
+		shop_manager.on_day_started(hours_remaining)
 
 	config_changed.emit()
 

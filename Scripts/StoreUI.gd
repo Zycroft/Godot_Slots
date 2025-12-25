@@ -2,10 +2,14 @@ extends Control
 
 # Loyalty Cashier store with shop dialog
 
+const LoyaltyCardClass = preload("res://Scripts/LoyaltyCard.gd")
+
 var teller_sprite: Sprite2D
 var shop_button: Button
 var restart_button: TextureButton
 var shop_dialog: Control
+var shop_status_label: Label
+var shop_closed_overlay: ColorRect
 
 # Animation settings (8x7 grid sprite sheets with 56 frames each)
 var teller_textures: Array[Texture2D] = []
@@ -40,6 +44,10 @@ func _ready():
 	_build_shop_button()
 	_build_restart_button()
 	_build_shop_dialog()
+
+	# Connect to shop signals
+	GameConfig.shop_opened.connect(_on_shop_opened)
+	GameConfig.shop_closed.connect(_on_shop_closed)
 
 func _process(delta):
 	_animate_teller(delta)
@@ -212,9 +220,9 @@ func _setup_dialog_content():
 	# Dialog panel - centered on screen using absolute position
 	var panel = PanelContainer.new()
 	panel.name = "DialogPanel"
-	panel.custom_minimum_size = Vector2(500, 400)
-	panel.size = Vector2(500, 400)
-	panel.position = Vector2((1920 - 500) / 2.0, (1080 - 400) / 2.0)
+	panel.custom_minimum_size = Vector2(600, 480)
+	panel.size = Vector2(600, 480)
+	panel.position = Vector2((1920 - 600) / 2.0, (1080 - 480) / 2.0)
 
 	var style = StyleBoxFlat.new()
 	style.bg_color = Color(0.15, 0.15, 0.2, 1)
@@ -233,7 +241,7 @@ func _setup_dialog_content():
 	# Content container
 	var vbox = VBoxContainer.new()
 	vbox.name = "Content"
-	vbox.add_theme_constant_override("separation", 15)
+	vbox.add_theme_constant_override("separation", 12)
 	panel.add_child(vbox)
 
 	# Title
@@ -245,24 +253,51 @@ func _setup_dialog_content():
 	title.add_theme_color_override("font_color", Color(0.9, 0.7, 0.2))
 	vbox.add_child(title)
 
-	# Subtitle
-	var subtitle = Label.new()
-	subtitle.text = "Today's Special Offers"
-	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle.add_theme_font_size_override("font_size", 16)
-	subtitle.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-	vbox.add_child(subtitle)
+	# Currency display
+	var currency_row = HBoxContainer.new()
+	currency_row.name = "CurrencyRow"
+	currency_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	currency_row.add_theme_constant_override("separation", 30)
+	vbox.add_child(currency_row)
+
+	var nuggets_label = Label.new()
+	nuggets_label.name = "NuggetsLabel"
+	nuggets_label.text = "Nuggets: 0"
+	nuggets_label.add_theme_font_size_override("font_size", 16)
+	nuggets_label.add_theme_color_override("font_color", Color(1.0, 0.65, 0.2))
+	currency_row.add_child(nuggets_label)
+
+	var bars_label = Label.new()
+	bars_label.name = "BarsLabel"
+	bars_label.text = "Bars: 0"
+	bars_label.add_theme_font_size_override("font_size", 16)
+	bars_label.add_theme_color_override("font_color", Color(1.0, 0.45, 0.1))
+	currency_row.add_child(bars_label)
 
 	# Separator
 	var sep = HSeparator.new()
 	vbox.add_child(sep)
 
+	# Subtitle
+	var subtitle = Label.new()
+	subtitle.name = "Subtitle"
+	subtitle.text = "Choose a card to purchase"
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle.add_theme_font_size_override("font_size", 16)
+	subtitle.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	vbox.add_child(subtitle)
+
 	# Cards container (will be populated with random cards)
 	var cards_container = HBoxContainer.new()
 	cards_container.name = "CardsContainer"
-	cards_container.add_theme_constant_override("separation", 20)
+	cards_container.add_theme_constant_override("separation", 15)
 	cards_container.alignment = BoxContainer.ALIGNMENT_CENTER
 	vbox.add_child(cards_container)
+
+	# Spacer
+	var spacer = Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
 
 	# Close button in center container
 	var btn_container = CenterContainer.new()
@@ -275,12 +310,51 @@ func _setup_dialog_content():
 	close_btn.pressed.connect(_close_shop)
 	btn_container.add_child(close_btn)
 
+	# Shop closed overlay
+	shop_closed_overlay = ColorRect.new()
+	shop_closed_overlay.name = "ShopClosedOverlay"
+	shop_closed_overlay.position = panel.position
+	shop_closed_overlay.size = panel.size
+	shop_closed_overlay.color = Color(0, 0, 0, 0.7)
+	shop_closed_overlay.visible = false
+	shop_dialog.add_child(shop_closed_overlay)
+
+	var closed_label = Label.new()
+	closed_label.text = "SHOP CLOSED\nCome back later!"
+	closed_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	closed_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	closed_label.add_theme_font_size_override("font_size", 32)
+	closed_label.add_theme_color_override("font_color", Color(0.9, 0.3, 0.3))
+	closed_label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	shop_closed_overlay.add_child(closed_label)
+
 func _open_shop():
+	_update_currency_display()
 	_populate_random_cards()
+	_update_shop_status()
 	shop_dialog.visible = true
 
 func _close_shop():
 	shop_dialog.visible = false
+
+func _update_currency_display():
+	var nuggets_label = shop_dialog.get_node_or_null("DialogPanel/Content/CurrencyRow/NuggetsLabel")
+	var bars_label = shop_dialog.get_node_or_null("DialogPanel/Content/CurrencyRow/BarsLabel")
+
+	if nuggets_label:
+		nuggets_label.text = "Nuggets: %d" % GameConfig.gold_nuggets
+	if bars_label:
+		bars_label.text = "Bars: %d" % GameConfig.gold_bars
+
+func _update_shop_status():
+	if shop_closed_overlay:
+		shop_closed_overlay.visible = not GameConfig.is_shop_open
+
+func _on_shop_opened():
+	_update_shop_status()
+
+func _on_shop_closed():
+	_update_shop_status()
 
 func _populate_random_cards():
 	var cards_container = shop_dialog.get_node("DialogPanel/Content/CardsContainer")
@@ -289,35 +363,38 @@ func _populate_random_cards():
 	for child in cards_container.get_children():
 		child.queue_free()
 
-	# Get all card types and shuffle them
-	var card_ids = GameConfig.CARD_DEFINITIONS.keys()
-	card_ids.shuffle()
+	# Generate new pack using shop manager
+	var pack = GameConfig.shop_manager.generate_new_pack()
 
-	# Show 3 random cards (or all if less than 3)
-	var num_cards = mini(3, card_ids.size())
-	for i in range(num_cards):
-		var card_id = card_ids[i]
-		var card_widget = _create_card_widget(card_id)
+	# Show all cards in the pack
+	for i in range(pack.size()):
+		var card = pack[i]
+		var card_widget = _create_card_widget(card, i)
 		cards_container.add_child(card_widget)
 
-func _create_card_widget(card_id: String) -> Control:
-	var card = GameConfig.CARD_DEFINITIONS[card_id]
-
+func _create_card_widget(card: LoyaltyCardClass, card_index: int) -> Control:
 	var container = VBoxContainer.new()
-	container.add_theme_constant_override("separation", 8)
+	container.add_theme_constant_override("separation", 6)
 
-	# Card panel with color
+	# Rarity label
+	var rarity_label = Label.new()
+	rarity_label.text = card.get_rarity_name()
+	rarity_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rarity_label.add_theme_font_size_override("font_size", 12)
+	rarity_label.add_theme_color_override("font_color", card.get_rarity_color())
+	container.add_child(rarity_label)
+
+	# Card panel with rarity-colored border
 	var card_panel = PanelContainer.new()
-	card_panel.custom_minimum_size = Vector2(130, 100)
-
-	var card_colors = {
-		"reel": Color(0.2, 0.5, 0.8),
-		"payline": Color(0.2, 0.7, 0.3),
-		"symbol": Color(0.8, 0.5, 0.2)
-	}
+	card_panel.custom_minimum_size = Vector2(160, 140)
 
 	var card_style = StyleBoxFlat.new()
-	card_style.bg_color = card_colors.get(card_id, Color(0.4, 0.4, 0.4))
+	card_style.bg_color = Color(0.12, 0.12, 0.18, 1.0)
+	card_style.border_width_left = 3
+	card_style.border_width_top = 3
+	card_style.border_width_right = 3
+	card_style.border_width_bottom = 3
+	card_style.border_color = card.get_rarity_color()
 	card_style.corner_radius_top_left = 8
 	card_style.corner_radius_top_right = 8
 	card_style.corner_radius_bottom_left = 8
@@ -327,37 +404,55 @@ func _create_card_widget(card_id: String) -> Control:
 
 	# Card content
 	var card_vbox = VBoxContainer.new()
-	card_vbox.add_theme_constant_override("separation", 5)
+	card_vbox.add_theme_constant_override("separation", 8)
 	card_panel.add_child(card_vbox)
 
 	# Card name
 	var name_label = Label.new()
-	name_label.text = card["name"]
+	name_label.text = card.name
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.add_theme_font_size_override("font_size", 14)
+	name_label.add_theme_font_size_override("font_size", 16)
 	name_label.add_theme_color_override("font_color", Color(1, 1, 1))
 	card_vbox.add_child(name_label)
 
 	# Card description
 	var desc_label = Label.new()
-	desc_label.text = card["description"]
+	desc_label.text = card.description
 	desc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	desc_label.add_theme_font_size_override("font_size", 18)
-	desc_label.add_theme_color_override("font_color", Color(1, 1, 1))
+	desc_label.add_theme_font_size_override("font_size", 14)
+	desc_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
+	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	card_vbox.add_child(desc_label)
+
+	# Spacer
+	var spacer = Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	card_vbox.add_child(spacer)
+
+	# Cost label
+	var cost_label = Label.new()
+	cost_label.text = card.get_cost_text()
+	cost_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	cost_label.add_theme_font_size_override("font_size", 14)
+	if card.bar_cost > 0:
+		cost_label.add_theme_color_override("font_color", Color(1.0, 0.45, 0.1))
+	else:
+		cost_label.add_theme_color_override("font_color", Color(1.0, 0.65, 0.2))
+	card_vbox.add_child(cost_label)
 
 	# Buy button
 	var buy_btn = Button.new()
-	buy_btn.text = "$" + str(GameConfig.get_card_cost(card_id))
-	buy_btn.custom_minimum_size = Vector2(130, 35)
-	buy_btn.add_theme_font_size_override("font_size", 16)
-	buy_btn.pressed.connect(_on_buy_card.bind(card_id, container))
-	buy_btn.disabled = not GameConfig.can_afford_card(card_id)
+	buy_btn.text = "Purchase"
+	buy_btn.custom_minimum_size = Vector2(160, 35)
+	buy_btn.add_theme_font_size_override("font_size", 14)
+	buy_btn.pressed.connect(_on_buy_card.bind(card_index))
+	buy_btn.disabled = not card.can_afford() or not GameConfig.is_shop_open
 	container.add_child(buy_btn)
 
 	return container
 
-func _on_buy_card(card_id: String, _widget: Control):
-	if GameConfig.buy_card(card_id):
-		# Refresh the dialog to update button states
+func _on_buy_card(card_index: int):
+	if GameConfig.shop_manager.purchase_card(card_index):
+		_update_currency_display()
+		# Generate new pack after purchase
 		_populate_random_cards()
