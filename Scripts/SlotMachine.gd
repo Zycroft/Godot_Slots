@@ -158,10 +158,10 @@ func _rebuild_reels():
 
 	# Update payout display position
 	if payout_display and is_instance_valid(payout_display):
-		payout_display.offset_left = reel_background.offset_left - 50
-		payout_display.offset_right = reel_background.offset_right + 50
-		payout_display.offset_top = reel_background.offset_top - 280
-		payout_display.offset_bottom = reel_background.offset_top - 200
+		payout_display.offset_left = reel_background.offset_left
+		payout_display.offset_right = reel_background.offset_right
+		payout_display.offset_top = reel_background.offset_top - 90
+		payout_display.offset_bottom = reel_background.offset_top - 5
 
 	# Initialize arrays
 	reel_panels = []
@@ -198,12 +198,12 @@ func _create_payout_display():
 	payout_display.set_script(payout_display_script)
 	payout_display.name = "PayoutDisplay"
 
-	# Position above the reel background (larger container)
+	# Position just above the reel background
 	var bg_top = reel_background.offset_top
-	payout_display.offset_left = reel_background.offset_left - 50
-	payout_display.offset_right = reel_background.offset_right + 50
-	payout_display.offset_top = bg_top - 280
-	payout_display.offset_bottom = bg_top - 200
+	payout_display.offset_left = reel_background.offset_left
+	payout_display.offset_right = reel_background.offset_right
+	payout_display.offset_top = bg_top - 90
+	payout_display.offset_bottom = bg_top - 5
 
 	add_child(payout_display)
 
