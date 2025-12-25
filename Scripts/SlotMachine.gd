@@ -2,7 +2,7 @@ extends Node2D
 
 # Reel container reference
 @onready var reel_container: HBoxContainer = $ReelContainer
-@onready var reel_background: Panel = $ReelBackground
+@onready var reel_background: TextureRect = $ReelBackground
 @onready var flame_effect: Sprite2D = $FlameEffect
 
 @onready var spin_button: Button = $SpinButton
@@ -63,15 +63,7 @@ func _ready():
 	lever_button.pressed.connect(_on_lever_clicked)
 	lever_start_pos = lever.position
 
-	# Create background panel style with 4px border
-	var bg_style = StyleBoxFlat.new()
-	bg_style.bg_color = Color(0.35, 0.35, 0.35, 1)
-	bg_style.border_width_left = 4
-	bg_style.border_width_top = 4
-	bg_style.border_width_right = 4
-	bg_style.border_width_bottom = 4
-	bg_style.border_color = Color(0, 0, 0, 1)
-	reel_background.add_theme_stylebox_override("panel", bg_style)
+	# Reel background now uses TextureRect with reelbackground.png
 
 	# Create reel panel style
 	reel_style = StyleBoxFlat.new()
@@ -124,14 +116,15 @@ func _rebuild_reels():
 	reel_container.offset_bottom = reel_height / 2
 
 	# Update background
-	var padding = 30.0
-	reel_background.offset_left = -(total_width / 2) - padding
-	reel_background.offset_right = (total_width / 2) + padding
-	reel_background.offset_top = -(reel_height / 2) - padding
-	reel_background.offset_bottom = (reel_height / 2) + padding
+	var padding_h = 20.0  # Horizontal padding
+	var padding_v = 20.0  # Vertical padding
+	reel_background.offset_left = -(total_width / 2) - padding_h
+	reel_background.offset_right = (total_width / 2) + padding_h
+	reel_background.offset_top = -(reel_height / 2) - padding_v
+	reel_background.offset_bottom = (reel_height / 2) + padding_v
 
 	# Update lever position (just right of reel background)
-	lever.offset_left = (total_width / 2) + padding - 15
+	lever.offset_left = (total_width / 2) + padding_h - 15
 	lever.offset_right = lever.offset_left + 60
 
 	# Initialize arrays
@@ -359,8 +352,14 @@ func _spawn_coins():
 		get_tree().create_timer(delay + 2.0).timeout.connect(coin.queue_free)
 
 func _play_flame_effect():
-	# Position flame at top of reel frame
-	flame_effect.position.y = reel_background.offset_top
+	# Position flame above the reels (at top of reel background)
+	flame_effect.position.y = reel_background.offset_top - 120
+
+	# Scale flame to match reel background width (flame frame is 512px wide)
+	var bg_width = reel_background.offset_right - reel_background.offset_left
+	var flame_scale = bg_width / 512.0
+	flame_effect.scale = Vector2(flame_scale, flame_scale)
+
 	flame_effect.frame = 0
 	flame_effect.visible = true
 	flame_effect.modulate.a = 1.0
@@ -368,10 +367,10 @@ func _play_flame_effect():
 	# Play fire crackle sound
 	sfx_fire_crackle.play()
 
-	# Animate through 14 frames (7 columns x 2 rows) - doubled duration
+	# Animate through 56 frames (8 columns x 7 rows)
 	var tween = create_tween()
-	for i in range(14):
-		tween.tween_property(flame_effect, "frame", i, 0.24)
+	for i in range(56):
+		tween.tween_property(flame_effect, "frame", i, 0.06)
 
 	# Fade out at the end
 	tween.tween_property(flame_effect, "modulate:a", 0.0, 1.2)

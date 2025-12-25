@@ -17,7 +17,8 @@
 [ext_resource type="Script" uid="uid://cr7cx3r0ou5pk" path="res://Scripts/StartScreen.gd" id="start_screen_script"]
 [ext_resource type="Script" uid="uid://bcc626ewap66r" path="res://Scripts/StoreUI.gd" id="store_script"]
 [ext_resource type="Texture2D" uid="uid://dqafaa71r1sp8" path="res://Assets/SingleImages/output/tray.png" id="tray_texture"]
-[ext_resource type="Texture2D" uid="uid://ct3t30w88pktg" path="res://Assets/flame_14frames.png" id="flame_texture"]
+[ext_resource type="Texture2D" path="res://Assets/fire_anim.png" id="flame_texture"]
+[ext_resource type="Texture2D" path="res://Assets/reelbackground.png" id="reel_bg_texture"]
 
 [node name="Main" type="Node2D"]
 
@@ -46,11 +47,14 @@ script = ExtResource("coin_script")
 position = Vector2(960, 540)
 script = ExtResource("1_script")
 
-[node name="ReelBackground" type="Panel" parent="SlotMachine"]
+[node name="ReelBackground" type="TextureRect" parent="SlotMachine"]
 offset_left = -350.0
 offset_top = -180.0
 offset_right = 350.0
 offset_bottom = 180.0
+texture = ExtResource("reel_bg_texture")
+expand_mode = 1
+stretch_mode = 0
 
 [node name="ReelContainer" type="HBoxContainer" parent="SlotMachine"]
 offset_left = -320.0
@@ -61,11 +65,12 @@ theme_override_constants/separation = 30
 
 [node name="FlameEffect" type="Sprite2D" parent="SlotMachine"]
 visible = false
-position = Vector2(0, 0)
-scale = Vector2(1.2, 1.2)
+z_index = 10
+position = Vector2(0, 380)
+scale = Vector2(0.576, 0.576)
 texture = ExtResource("flame_texture")
-hframes = 7
-vframes = 2
+hframes = 8
+vframes = 7
 
 [node name="SpinButton" type="Button" parent="SlotMachine"]
 visible = false

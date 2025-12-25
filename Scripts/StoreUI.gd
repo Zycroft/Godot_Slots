@@ -4,7 +4,7 @@ extends Control
 
 var teller_sprite: Sprite2D
 var shop_button: Button
-var restart_button: Button
+var restart_button: TextureButton
 var shop_dialog: Control
 
 # Animation settings (8x7 grid sprite sheets with 56 frames each)
@@ -25,6 +25,17 @@ var idle_frames_remaining: int = 0
 const MIN_IDLE_FRAMES = 15
 const MAX_IDLE_FRAMES = 40
 
+# Store background animation (13x12 grid, 512x512 frames)
+var store_anim_sprite: Sprite2D
+var store_anim_texture: Texture2D
+var store_anim_frame: int = 0
+var store_anim_timer: float = 0.0
+const STORE_FRAME_COUNT = 150  # Skip last 6 frames
+const STORE_COLUMNS = 13
+const STORE_FRAME_WIDTH = 512
+const STORE_FRAME_HEIGHT = 512
+const STORE_FRAME_DURATION = 0.1
+
 func _ready():
 	_build_shop_button()
 	_build_restart_button()
@@ -32,6 +43,21 @@ func _ready():
 
 func _process(delta):
 	_animate_teller(delta)
+	_animate_store_background(delta)
+
+func _animate_store_background(delta):
+	if store_anim_sprite == null or not shop_dialog.visible:
+		return
+
+	store_anim_timer += delta
+	if store_anim_timer >= STORE_FRAME_DURATION:
+		store_anim_timer = 0.0
+		store_anim_frame = (store_anim_frame + 1) % STORE_FRAME_COUNT
+		@warning_ignore("integer_division")
+		var col: int = store_anim_frame % STORE_COLUMNS
+		@warning_ignore("integer_division")
+		var row: int = store_anim_frame / STORE_COLUMNS
+		store_anim_sprite.region_rect = Rect2(col * STORE_FRAME_WIDTH, row * STORE_FRAME_HEIGHT, STORE_FRAME_WIDTH, STORE_FRAME_HEIGHT)
 
 func _animate_teller(delta):
 	if teller_sprite == null:
@@ -127,11 +153,13 @@ func _build_shop_button():
 	container.add_child(shop_button)
 
 func _build_restart_button():
-	restart_button = Button.new()
-	restart_button.text = "Restart\nGame"
-	restart_button.custom_minimum_size = Vector2(128, 60)
+	var restart_texture = load("res://Assets/but_restart.png")
+	restart_button = TextureButton.new()
+	restart_button.texture_normal = restart_texture
+	restart_button.custom_minimum_size = Vector2(154, 154)  # 20% bigger
 	restart_button.position = Vector2(-20, 190)
-	restart_button.add_theme_font_size_override("font_size", 16)
+	restart_button.ignore_texture_size = true
+	restart_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 	restart_button.pressed.connect(_on_restart_pressed)
 	add_child(restart_button)
 
@@ -157,12 +185,27 @@ func _add_dialog_to_root():
 		_setup_dialog_content()
 
 func _setup_dialog_content():
-	# Dimmer background - cover entire screen
+	# Load store animation texture
+	store_anim_texture = load("res://Assets/store_anim.png")
+
+	# Animated store background - cover entire screen
+	store_anim_sprite = Sprite2D.new()
+	store_anim_sprite.name = "StoreBackground"
+	store_anim_sprite.texture = store_anim_texture
+	store_anim_sprite.centered = false
+	store_anim_sprite.region_enabled = true
+	store_anim_sprite.region_rect = Rect2(0, 0, STORE_FRAME_WIDTH, STORE_FRAME_HEIGHT)
+	# Scale 512x512 to fill 1920x1080
+	store_anim_sprite.scale = Vector2(1920.0 / STORE_FRAME_WIDTH, 1080.0 / STORE_FRAME_HEIGHT)
+	store_anim_sprite.position = Vector2(0, 0)
+	shop_dialog.add_child(store_anim_sprite)
+
+	# Semi-transparent overlay for readability
 	var dimmer = ColorRect.new()
 	dimmer.name = "Dimmer"
 	dimmer.position = Vector2(0, 0)
 	dimmer.size = Vector2(1920, 1080)
-	dimmer.color = Color(0, 0, 0, 0.6)
+	dimmer.color = Color(0, 0, 0, 0.4)
 	dimmer.mouse_filter = Control.MOUSE_FILTER_STOP
 	shop_dialog.add_child(dimmer)
 
