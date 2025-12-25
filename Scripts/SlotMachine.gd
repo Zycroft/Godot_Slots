@@ -57,6 +57,7 @@ var grid_overlay_script = preload("res://Scripts/GridOverlay.gd")
 var coin_script = preload("res://Scripts/CoinAnimation.gd")
 var payout_display_script = preload("res://Scripts/PayoutDisplay.gd")
 var currency_converter_script = preload("res://Scripts/CurrencyConverter.gd")
+var day_end_screen_script = preload("res://Scripts/DayEndScreen.gd")
 
 # Payout display reference
 var payout_display: Panel
@@ -68,6 +69,9 @@ var currency_hud: Control
 var coins_value_label: Label
 var nuggets_value_label: Label
 var bars_value_label: Label
+
+# Day end screen
+var day_end_screen: Control
 
 # Coin spawning
 var coin_texture: Texture2D
@@ -291,6 +295,14 @@ func _create_currency_ui():
 	# Connect to currency changes
 	GameConfig.currency_changed.connect(_on_currency_value_changed)
 
+	# Create day end screen (fullscreen overlay)
+	day_end_screen = Control.new()
+	day_end_screen.set_script(day_end_screen_script)
+	day_end_screen.name = "DayEndScreen"
+	day_end_screen.set_anchors_preset(Control.PRESET_FULL_RECT)
+	day_end_screen.z_index = 20  # Above everything
+	hud.add_child(day_end_screen)
+
 	# Initial update
 	_update_currency_hud()
 
@@ -509,7 +521,14 @@ func _on_spin_pressed():
 		if is_spinning or GameConfig.casino_coins < GameConfig.spin_cost or GameConfig.hours_remaining < GameConfig.hours_per_spin:
 			return
 		GameConfig.spend_casino_coins(GameConfig.spin_cost)
-		GameConfig.hours_remaining -= GameConfig.hours_per_spin
+		# Use time and check if day ends
+		var can_continue = GameConfig.use_time(GameConfig.hours_per_spin)
+		if not can_continue:
+			# Day ended - the DayEndScreen will show via signal
+			_update_credits_display()
+			_update_hud()
+			_update_currency_hud()
+			return
 	else:
 		if is_spinning:
 			return

@@ -3,12 +3,16 @@ extends Node
 # Preload ReelObject class
 const ReelObjectClass = preload("res://Scripts/ReelObject.gd")
 const CurrencyManagerClass = preload("res://Scripts/CurrencyManager.gd")
+const DayManagerClass = preload("res://Scripts/DayManager.gd")
 
 # Signals
 signal config_changed
 signal card_purchased(card_id: String)
 signal game_reset
 signal currency_changed(currency_type: String, new_amount: int)
+signal day_started(day_number: int, marker_amount: int)
+signal day_ended(day_number: int, success: bool, coins_earned: int)
+signal marker_progress_updated(current_coins: int, marker_amount: int)
 
 # Config file path
 const CONFIG_PATH = "res://Config/game_config.json"
@@ -57,6 +61,13 @@ var gold_nuggets: int:
 	get: return currency_manager.gold_nuggets if currency_manager else 0
 var gold_bars: int:
 	get: return currency_manager.gold_bars if currency_manager else 0
+
+# Day/Marker System
+var day_manager: DayManagerClass = null
+var current_day: int:
+	get: return day_manager.current_day if day_manager else 1
+var marker_amount: int:
+	get: return day_manager.marker_amount if day_manager else 0
 
 # Loyalty Card System
 var owned_cards: Array = []
@@ -116,6 +127,13 @@ func _ready():
 	# Initialize currency manager
 	currency_manager = CurrencyManagerClass.new()
 	currency_manager.currency_changed.connect(_on_currency_changed)
+
+	# Initialize day manager
+	day_manager = DayManagerClass.new()
+	day_manager.day_started.connect(_on_day_started)
+	day_manager.day_ended.connect(_on_day_ended)
+	day_manager.marker_updated.connect(_on_marker_updated)
+
 	load_config()
 
 func load_config(path: String = CONFIG_PATH) -> bool:
@@ -307,6 +325,13 @@ func start_game(difficulty: String) -> void:
 	if currency_manager:
 		currency_manager.reset_all()
 		currency_manager.casino_coins = credits
+
+	# Start day 1
+	if day_manager:
+		day_manager.reset()
+		day_manager.start_day(1)
+		hours_remaining = day_manager.hours_remaining
+
 	config_changed.emit()
 
 func get_card_cost(card_id: String) -> int:
@@ -382,5 +407,62 @@ func reset_game() -> void:
 	owned_cards.clear()
 	if currency_manager:
 		currency_manager.reset_all()
+	if day_manager:
+		day_manager.reset()
 	load_config()  # Reload original config
 	game_reset.emit()
+
+# Day manager signal handlers
+func _on_day_started(day_number: int, marker: int) -> void:
+	day_started.emit(day_number, marker)
+
+func _on_day_ended(day_number: int, success: bool, coins_earned: int) -> void:
+	day_ended.emit(day_number, success, coins_earned)
+
+func _on_marker_updated(current_coins: int, marker: int) -> void:
+	marker_progress_updated.emit(current_coins, marker)
+
+# Day system methods
+func use_time(hours: float) -> bool:
+	if day_manager:
+		hours_remaining -= hours
+		var can_continue = day_manager.use_time(hours)
+		if not can_continue:
+			_handle_day_end()
+			return false
+	return true
+
+func _handle_day_end() -> void:
+	if not day_manager:
+		return
+
+	var coins_earned = casino_coins
+	var result = day_manager.end_day(coins_earned)
+
+	# Show end of day result
+	day_ended.emit(result.day, result.success, coins_earned)
+
+func start_next_day() -> void:
+	if not day_manager:
+		return
+
+	# Reset casino coins for new day (nuggets/bars persist)
+	if currency_manager:
+		currency_manager.reset_casino_coins()
+		credits = 0
+
+	# Advance to next day
+	day_manager.advance_day()
+	hours_remaining = day_manager.hours_remaining
+
+	config_changed.emit()
+
+func get_marker_progress() -> float:
+	if day_manager:
+		return day_manager.get_marker_progress(casino_coins)
+	return 0.0
+
+func is_marker_covered() -> bool:
+	if day_manager:
+		return day_manager.is_marker_covered(casino_coins)
+	return false
