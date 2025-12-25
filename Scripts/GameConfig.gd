@@ -19,6 +19,9 @@ var reel_stop_delay: float = 0.3
 # Symbol texture paths
 var symbols: Dictionary = {}
 
+# Symbol payouts (symbol_name -> { "3": payout, "4": payout, "5": payout })
+var symbol_payouts: Dictionary = {}
+
 # Reel configurations (array of symbol names per reel)
 var reels: Array = []
 
@@ -131,6 +134,10 @@ func _apply_config(data: Dictionary):
 		symbols = data["symbols"]
 		_load_symbol_textures()
 
+	# Apply symbol payouts
+	if data.has("symbol_payouts"):
+		symbol_payouts = data["symbol_payouts"]
+
 	# Apply reels
 	if data.has("reels"):
 		reels = data["reels"]
@@ -195,6 +202,7 @@ func save_config(path: String = CONFIG_PATH) -> bool:
 		"spin_duration": spin_duration,
 		"reel_stop_delay": reel_stop_delay,
 		"symbols": symbols,
+		"symbol_payouts": symbol_payouts,
 		"reels": reels,
 		"paylines": paylines,
 		"credits": credits,

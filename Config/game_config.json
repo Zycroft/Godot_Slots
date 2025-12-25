@@ -12,6 +12,13 @@
 		"grape": "res://Assets/SingleImages/output/Grape.png",
 		"creature": "res://Assets/SingleImages/output/Creature.png"
 	},
+	"symbol_payouts": {
+		"cherry": { "3": 5, "4": 15, "5": 50 },
+		"lemon": { "3": 8, "4": 20, "5": 75 },
+		"grape": { "3": 10, "4": 30, "5": 100 },
+		"creature": { "3": 25, "4": 75, "5": 200 },
+		"red7": { "3": 50, "4": 150, "5": 500 }
+	},
 	"reels": [
 		{
 			"symbols": ["cherry", "lemon", "red7", "grape", "creature", "cherry", "lemon", "red7", "grape", "creature"]

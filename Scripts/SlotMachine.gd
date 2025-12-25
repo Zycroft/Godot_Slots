@@ -1,5 +1,8 @@
 extends Node2D
 
+# Signals
+signal spin_complete(wins: Array, total_payout: int)
+
 # Reel container reference
 @onready var reel_container: HBoxContainer = $ReelContainer
 @onready var reel_background: TextureRect = $ReelBackground
@@ -49,6 +52,10 @@ var is_lever_pulling: bool = false
 # Preloaded scripts
 var grid_overlay_script = preload("res://Scripts/GridOverlay.gd")
 var coin_script = preload("res://Scripts/CoinAnimation.gd")
+var payout_display_script = preload("res://Scripts/PayoutDisplay.gd")
+
+# Payout display reference
+var payout_display: Panel
 
 # Coin spawning
 var coin_texture: Texture2D
@@ -86,6 +93,9 @@ func _ready():
 
 	# Load coin texture
 	coin_texture = load("res://Assets/SingleImages/output/gold_coin_strip.png")
+
+	# Create payout display above reels
+	_create_payout_display()
 
 func _on_config_changed():
 	# Rebuild reels when config changes (only if not spinning)
@@ -127,6 +137,13 @@ func _rebuild_reels():
 	lever.offset_left = (total_width / 2) + padding_h - 15
 	lever.offset_right = lever.offset_left + 60
 
+	# Update payout display position
+	if payout_display and is_instance_valid(payout_display):
+		payout_display.offset_left = reel_background.offset_left - 50
+		payout_display.offset_right = reel_background.offset_right + 50
+		payout_display.offset_top = reel_background.offset_top - 280
+		payout_display.offset_bottom = reel_background.offset_top - 200
+
 	# Initialize arrays
 	reel_panels = []
 	reel_strips = []
@@ -151,6 +168,25 @@ func _clear_reels():
 			panel.queue_free()
 	reel_panels.clear()
 	reel_strips.clear()
+
+func _create_payout_display():
+	# Remove existing payout display if any
+	if payout_display and is_instance_valid(payout_display):
+		payout_display.queue_free()
+
+	# Create new payout display
+	payout_display = Panel.new()
+	payout_display.set_script(payout_display_script)
+	payout_display.name = "PayoutDisplay"
+
+	# Position above the reel background (larger container)
+	var bg_top = reel_background.offset_top
+	payout_display.offset_left = reel_background.offset_left - 50
+	payout_display.offset_right = reel_background.offset_right + 50
+	payout_display.offset_top = bg_top - 280
+	payout_display.offset_bottom = bg_top - 200
+
+	add_child(payout_display)
 
 func _create_reel(reel_index: int, width: float, height: float, num_slots: int):
 	# Create Panel
@@ -289,6 +325,32 @@ func _update_reel_position(reel_index: int):
 	# Simply position the strip so symbols align with the visible area
 	strip.position.y = -visual_pos
 
+# Get the currently visible symbols on all reels
+# Returns 2D array: [reel_index][row_index] = symbol_name
+func _get_visible_symbols() -> Array:
+	var visible_symbols: Array = []
+	var visible_rows = GameConfig.visible_rows
+
+	for reel_idx in range(reel_panels.size()):
+		var reel_symbols: Array = []
+		var reel_config = GameConfig.get_reel_symbols(reel_idx)
+		var reelslots = GameConfig.reelslots
+
+		# Calculate which symbol is at the top of the visible area
+		var top_symbol_index = final_symbols[reel_idx]
+
+		# Get symbols for each visible row
+		for row in range(visible_rows):
+			var symbol_index = (top_symbol_index + row) % reelslots
+			if symbol_index < reel_config.size():
+				reel_symbols.append(reel_config[symbol_index])
+			else:
+				reel_symbols.append("")
+
+		visible_symbols.append(reel_symbols)
+
+	return visible_symbols
+
 func _on_spin_pressed():
 	if not GameConfig.game_started:
 		return
@@ -323,14 +385,35 @@ func _stop_spin():
 	spin_button.disabled = false
 	lever_button.disabled = false
 
-	# Play flame eruption effect
-	_play_flame_effect()
+	# Get visible symbols and check for wins
+	var visible_symbols = _get_visible_symbols()
+	var wins = WinChecker.check_wins(visible_symbols, GameConfig.paylines, GameConfig.symbol_payouts)
+	var total_payout = WinChecker.calculate_total_payout(wins)
 
-	# Spawn coins when spin stops
-	_spawn_coins()
+	# Award winnings
+	if total_payout > 0:
+		GameConfig.credits += total_payout
+		_update_credits_display()
+		_update_hud()
 
-func _spawn_coins():
-	for i in range(coins_to_spawn):
+		# Play win effects
+		_play_flame_effect()
+		sfx_slot_win.play()
+
+		# Spawn coins based on payout (1 coin per 10 credits, min 3, max 20)
+		var coin_count = clampi(total_payout / 10, 3, 20)
+		_spawn_coins(coin_count)
+
+		# Debug: Print wins
+		for win in wins:
+			print(win)
+
+	# Emit signal with win data
+	spin_complete.emit(wins, total_payout)
+
+func _spawn_coins(count: int = -1):
+	var num_coins = count if count > 0 else coins_to_spawn
+	for i in range(num_coins):
 		var coin = Sprite2D.new()
 		coin.texture = coin_texture
 		coin.hframes = 144
