@@ -49,6 +49,9 @@ func _ready():
 	GameConfig.shop_opened.connect(_on_shop_opened)
 	GameConfig.shop_closed.connect(_on_shop_closed)
 
+	# Set initial button state (shop starts closed)
+	_update_shop_button_state()
+
 func _process(delta):
 	_animate_teller(delta)
 	_animate_store_background(delta)
@@ -352,9 +355,21 @@ func _update_shop_status():
 
 func _on_shop_opened():
 	_update_shop_status()
+	_update_shop_button_state()
 
 func _on_shop_closed():
 	_update_shop_status()
+	_update_shop_button_state()
+
+func _update_shop_button_state():
+	if shop_button:
+		shop_button.disabled = not GameConfig.is_shop_open
+		if GameConfig.is_shop_open:
+			shop_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+			teller_sprite.modulate = Color(1, 1, 1, 1)
+		else:
+			shop_button.mouse_default_cursor_shape = Control.CURSOR_ARROW
+			teller_sprite.modulate = Color(0.5, 0.5, 0.5, 1)  # Dim when closed
 
 func _populate_random_cards():
 	var cards_container = shop_dialog.get_node("DialogPanel/Content/CardsContainer")
