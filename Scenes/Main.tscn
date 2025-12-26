@@ -90,12 +90,11 @@ offset_bottom = 80.0
 
 [node name="LeverButton" type="Button" parent="SlotMachine/Lever"]
 modulate = Color(1, 1, 1, 0)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_left = 9.0
+offset_top = 0.0
+offset_right = 69.0
+offset_bottom = 200.0
 
 [node name="LeverSprite" type="Sprite2D" parent="SlotMachine/Lever"]
 position = Vector2(29, 100)
@@ -139,6 +138,7 @@ offset_left = -30.0
 offset_top = -45.0
 offset_right = 292.0
 offset_bottom = 281.0
+mouse_filter = 2
 script = ExtResource("marker_script")
 
 [node name="Background" type="TextureRect" parent="HUD/Marker"]
@@ -148,6 +148,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 texture = ExtResource("marker_bg")
 expand_mode = 1
 stretch_mode = 4
@@ -166,6 +167,7 @@ offset_left = -60.0
 offset_top = 165.0
 offset_right = 380.0
 offset_bottom = 215.0
+mouse_filter = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 28
 text = "$10,000"
@@ -178,6 +180,7 @@ offset_left = -110.0
 offset_top = 209.0
 offset_right = 330.0
 offset_bottom = 250.0
+mouse_filter = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 18
 text = "24"

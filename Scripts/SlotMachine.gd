@@ -160,8 +160,8 @@ func _rebuild_reels():
 	if payout_display and is_instance_valid(payout_display):
 		payout_display.offset_left = reel_background.offset_left
 		payout_display.offset_right = reel_background.offset_right
-		payout_display.offset_top = reel_background.offset_top - 90
-		payout_display.offset_bottom = reel_background.offset_top - 5
+		payout_display.offset_top = reel_background.offset_top - 390
+		payout_display.offset_bottom = reel_background.offset_top - 305
 
 	# Initialize arrays
 	reel_panels = []
@@ -202,8 +202,8 @@ func _create_payout_display():
 	var bg_top = reel_background.offset_top
 	payout_display.offset_left = reel_background.offset_left
 	payout_display.offset_right = reel_background.offset_right
-	payout_display.offset_top = bg_top - 90
-	payout_display.offset_bottom = bg_top - 5
+	payout_display.offset_top = bg_top - 390
+	payout_display.offset_bottom = bg_top - 305
 
 	add_child(payout_display)
 
@@ -585,6 +585,7 @@ func _stop_spin():
 		sfx_slot_win.play()
 
 		# Spawn coins based on payout (1 coin per 10 credits, min 3, max 20)
+		@warning_ignore("integer_division")
 		var coin_count = clampi(total_payout / 10, 3, 20)
 		_spawn_coins(coin_count)
 

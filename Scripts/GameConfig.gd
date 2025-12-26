@@ -337,9 +337,11 @@ func start_game(difficulty: String) -> void:
 	game_started = true
 
 	# Initialize currency with starting credits
+	var starting_credits = credits  # Save before reset overwrites it
 	if currency_manager:
 		currency_manager.reset_all()
-		currency_manager.casino_coins = credits
+		currency_manager.add_currency(CurrencyManagerClass.CurrencyType.CASINO_COINS, starting_credits)
+		credits = starting_credits  # Restore after signal handler set it to 0
 
 	# Start day 1
 	if day_manager:

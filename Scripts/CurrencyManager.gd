@@ -102,9 +102,11 @@ func can_convert_nuggets_to_bars(bar_count: int = 1) -> bool:
 
 # Get max convertible amounts
 func get_max_nuggets_from_coins() -> int:
+	@warning_ignore("integer_division")
 	return casino_coins / COINS_PER_NUGGET
 
 func get_max_bars_from_nuggets() -> int:
+	@warning_ignore("integer_division")
 	return gold_nuggets / NUGGETS_PER_BAR
 
 # Perform conversions (one-way, irreversible)
