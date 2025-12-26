@@ -115,7 +115,20 @@
       "Bash(if [ ! -f \"$file\" ])",
       "Bash(basename:*)",
       "Bash(while read -r f)",
-      "Bash(do test ! -f \"$f\")"
+      "Bash(do test ! -f \"$f\")",
+      "Bash(for:*)",
+            "mcp__gemini__gemini-image-prompt",
+      "mcp__imagemagick__create_spritesheet",
+      "Bash(lsof:*)",
+      "Bash(gh run list:*)",
+      "Bash(pkill:*)",
+      "Bash(pgrep:*)",
+      "Bash(do echo -n \"$f: \")",
+      "Bash(do echo -n \"frame_$i: \")",
+      "WebSearch",
+            "mcp__notion__API-post-search",
+      "mcp__notion__API-get-block-children",
+      "WebFetch(domain:httpbin.org)"
     ]
   },
   "enableAllProjectMcpServers": true,
