@@ -76,6 +76,7 @@ func _ready():
 	bg_style.corner_radius_bottom_right = 4
 	progress_bar.add_theme_stylebox_override("background", bg_style)
 
+	progress_bar.visible = false  # Hide progress bar for now
 	add_child(progress_bar)
 
 	# Create audio players
