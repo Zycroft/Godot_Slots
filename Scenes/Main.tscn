@@ -19,6 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://dqafaa71r1sp8" path="res://Assets/SingleImages/output/tray.png" id="tray_texture"]
 [ext_resource type="Texture2D" path="res://Assets/fire_anim.png" id="flame_texture"]
 [ext_resource type="Texture2D" path="res://Assets/reelbackground.png" id="reel_bg_texture"]
+[ext_resource type="Texture2D" path="res://Assets/PayOut.png" id="payout_texture"]
 
 [node name="Main" type="Node2D"]
 
@@ -46,6 +47,15 @@ script = ExtResource("coin_script")
 [node name="SlotMachine" type="Node2D" parent="."]
 position = Vector2(960, 540)
 script = ExtResource("1_script")
+
+[node name="PayoutPlaque" type="TextureRect" parent="SlotMachine"]
+offset_left = -205.0
+offset_top = -277.0
+offset_right = 205.0
+offset_bottom = -37.0
+texture = ExtResource("payout_texture")
+expand_mode = 1
+stretch_mode = 0
 
 [node name="ReelBackground" type="TextureRect" parent="SlotMachine"]
 offset_left = -350.0

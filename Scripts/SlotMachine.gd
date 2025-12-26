@@ -7,6 +7,7 @@ signal spin_complete(wins: Array, total_payout: int)
 @onready var reel_container: HBoxContainer = $ReelContainer
 @onready var reel_background: TextureRect = $ReelBackground
 @onready var flame_effect: Sprite2D = $FlameEffect
+@onready var payout_plaque: TextureRect = $PayoutPlaque
 
 @onready var spin_button: Button = $SpinButton
 @onready var credits_label: Label = $CreditsLabel
@@ -162,6 +163,14 @@ func _rebuild_reels():
 		payout_display.offset_right = reel_background.offset_right
 		payout_display.offset_top = reel_background.offset_top - 390
 		payout_display.offset_bottom = reel_background.offset_top - 305
+
+	# Update payout plaque to match reel background width and position above it
+	if payout_plaque and is_instance_valid(payout_plaque):
+		payout_plaque.offset_left = reel_background.offset_left + 1
+		payout_plaque.offset_right = reel_background.offset_right - 1
+		var plaque_height = payout_plaque.offset_bottom - payout_plaque.offset_top
+		payout_plaque.offset_bottom = reel_background.offset_top - 5
+		payout_plaque.offset_top = payout_plaque.offset_bottom - plaque_height
 
 	# Initialize arrays
 	reel_panels = []
