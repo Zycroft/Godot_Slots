@@ -80,7 +80,8 @@ func _build_payout_display():
 		if entry:
 			payout_container.add_child(entry)
 
-# Named comparator function for symbol sorting (more efficient than lambda)
+# Comparator for symbol sorting (Godot 4 uses bool: true if 'a' should come before 'b')
+# Returns true when payout_a > payout_b to sort in descending order (highest first)
 func _compare_symbols_by_payout(a: String, b: String) -> bool:
 	var payout_a = _get_base_payout(a, _sort_payouts)
 	var payout_b = _get_base_payout(b, _sort_payouts)

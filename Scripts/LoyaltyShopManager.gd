@@ -33,8 +33,11 @@ func _init():
 
 # Called when a new day starts - generates shop availability window
 func on_day_started(day_hours: float) -> void:
-	# Random shop opening time in the middle of the day
-	# Shop opens somewhere between 25% and 50% through the day
+	# Shop hours are based on hours_remaining (counts down from day_hours to 0)
+	# shop_open_hour = hours_remaining when shop OPENS (higher value)
+	# shop_close_hour = hours_remaining when shop CLOSES (lower value)
+
+	# Shop opens when 25-50% of time remains (50-75% through the day)
 	var min_open = day_hours * 0.25
 	var max_open = day_hours * 0.50
 	shop_open_hour = randf_range(min_open, max_open)
@@ -43,9 +46,15 @@ func on_day_started(day_hours: float) -> void:
 	var shop_duration = randf_range(1.0, 3.0)
 	shop_close_hour = shop_open_hour - shop_duration
 
-	# Make sure close hour doesn't go negative
-	if shop_close_hour < 0.5:
-		shop_close_hour = 0.5
+	# Ensure close hour doesn't go below minimum and window stays valid
+	var min_close_hour = 0.5
+	if shop_close_hour < min_close_hour:
+		shop_close_hour = min_close_hour
+
+	# Ensure shop_open_hour > shop_close_hour (valid window)
+	# If clamping made the window invalid, adjust shop_open_hour
+	if shop_open_hour <= shop_close_hour:
+		shop_open_hour = shop_close_hour + minf(shop_duration, 1.0)
 
 	shop_open = false
 
