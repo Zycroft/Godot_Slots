@@ -52,12 +52,20 @@ func _ready():
 	# Set initial button state (shop starts closed)
 	_update_shop_button_state()
 
+func _exit_tree():
+	# Disconnect signals to prevent memory leaks
+	if GameConfig.shop_opened.is_connected(_on_shop_opened):
+		GameConfig.shop_opened.disconnect(_on_shop_opened)
+	if GameConfig.shop_closed.is_connected(_on_shop_closed):
+		GameConfig.shop_closed.disconnect(_on_shop_closed)
+
 func _process(delta):
 	_animate_teller(delta)
 	_animate_store_background(delta)
 
 func _animate_store_background(delta):
-	if store_anim_sprite == null or not shop_dialog.visible:
+	# Early exit if dialog not visible (most common case) or sprite not ready
+	if not shop_dialog or not shop_dialog.visible or not store_anim_sprite:
 		return
 
 	store_anim_timer += delta

@@ -12,12 +12,17 @@ var anim_sprite: Sprite2D
 var background: TextureRect
 const TOTAL_FRAMES = 49  # 7x7 sprite sheet
 var frame_tween: Tween
+var fly_in_tween: Tween
 
-# Labels for display
+# Labels for display (cached references)
 var amount_label: Label
 var due_label: Label
 var day_label: Label
 var progress_bar: ProgressBar
+
+# Fly-in state tracking to prevent redundant animations
+var _is_flying_in: bool = false
+var _has_flown_in: bool = false
 
 func _ready():
 	# Store the final destination position
@@ -94,8 +99,26 @@ func _ready():
 	GameConfig.currency_changed.connect(_on_currency_changed)
 	GameConfig.day_started.connect(_on_day_started)
 
+func _exit_tree():
+	# Disconnect signals to prevent memory leaks
+	if GameConfig.config_changed.is_connected(_on_config_changed):
+		GameConfig.config_changed.disconnect(_on_config_changed)
+	if GameConfig.game_reset.is_connected(_on_game_reset):
+		GameConfig.game_reset.disconnect(_on_game_reset)
+	if GameConfig.currency_changed.is_connected(_on_currency_changed):
+		GameConfig.currency_changed.disconnect(_on_currency_changed)
+	if GameConfig.day_started.is_connected(_on_day_started):
+		GameConfig.day_started.disconnect(_on_day_started)
+
+	# Kill active tweens
+	if frame_tween and frame_tween.is_valid():
+		frame_tween.kill()
+	if fly_in_tween and fly_in_tween.is_valid():
+		fly_in_tween.kill()
+
 func _on_config_changed():
-	if GameConfig.game_started and not visible:
+	# Only fly in once per game session, and only when not already flying
+	if GameConfig.game_started and not _has_flown_in and not _is_flying_in:
 		_fly_in()
 	_update_display()
 
@@ -103,6 +126,14 @@ func _on_game_reset():
 	# Reset to off-screen position
 	position = start_position
 	visible = false
+	_has_flown_in = false
+	_is_flying_in = false
+
+	# Kill any active tweens
+	if frame_tween and frame_tween.is_valid():
+		frame_tween.kill()
+	if fly_in_tween and fly_in_tween.is_valid():
+		fly_in_tween.kill()
 
 func _on_currency_changed(_currency_type: String, _new_amount: int):
 	_update_display()
@@ -149,6 +180,7 @@ func _update_display():
 				bar_style.bg_color = Color(0.8, 0.3, 0.2, 1.0)  # Red - behind
 
 func _fly_in():
+	_is_flying_in = true
 	visible = true
 	position = start_position
 
@@ -160,22 +192,31 @@ func _fly_in():
 	# Play swoosh sound
 	swoosh_sound.play()
 
+	# Kill any existing tweens before creating new ones
+	if frame_tween and frame_tween.is_valid():
+		frame_tween.kill()
+	if fly_in_tween and fly_in_tween.is_valid():
+		fly_in_tween.kill()
+
 	# Animate through sprite sheet frames during fly-in
 	var fly_duration = 2.025  # 80% slower than original 1.125s
 	frame_tween = create_tween()
 	frame_tween.tween_method(_set_frame, 0, TOTAL_FRAMES - 1, fly_duration)
 
 	# Create fly-in animation with easing
-	var tween = create_tween()
-	tween.set_ease(Tween.EASE_OUT)
-	tween.set_trans(Tween.TRANS_BACK)
-	tween.tween_property(self, "position", end_position, fly_duration)
-	tween.tween_callback(_on_fly_in_complete)
+	fly_in_tween = create_tween()
+	fly_in_tween.set_ease(Tween.EASE_OUT)
+	fly_in_tween.set_trans(Tween.TRANS_BACK)
+	fly_in_tween.tween_property(self, "position", end_position, fly_duration)
+	fly_in_tween.tween_callback(_on_fly_in_complete)
 
 func _set_frame(frame_num: int):
 	anim_sprite.frame = frame_num
 
 func _on_fly_in_complete():
+	_is_flying_in = false
+	_has_flown_in = true
+
 	# Switch from animated sprite to static background
 	anim_sprite.visible = false
 	background.visible = true
@@ -185,10 +226,10 @@ func _on_fly_in_complete():
 
 	# Add a small shake effect
 	var original_pos = position
-	var tween = create_tween()
-	tween.tween_property(self, "position", original_pos + Vector2(-5, 5), 0.03)
-	tween.tween_property(self, "position", original_pos + Vector2(3, -3), 0.03)
-	tween.tween_property(self, "position", original_pos, 0.03)
+	var shake_tween = create_tween()
+	shake_tween.tween_property(self, "position", original_pos + Vector2(-5, 5), 0.03)
+	shake_tween.tween_property(self, "position", original_pos + Vector2(3, -3), 0.03)
+	shake_tween.tween_property(self, "position", original_pos, 0.03)
 
 	# Update display with initial values
 	_update_display()

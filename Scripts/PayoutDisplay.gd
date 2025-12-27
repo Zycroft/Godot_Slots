@@ -47,8 +47,16 @@ func _ready():
 	# Connect to config changes
 	GameConfig.config_changed.connect(_on_config_changed)
 
+func _exit_tree():
+	# Disconnect signals to prevent memory leaks
+	if GameConfig.config_changed.is_connected(_on_config_changed):
+		GameConfig.config_changed.disconnect(_on_config_changed)
+
 func _on_config_changed():
 	_build_payout_display()
+
+# Cached reference for sort comparator
+var _sort_payouts: Dictionary = {}
 
 func _build_payout_display():
 	# Clear existing entries
@@ -59,19 +67,24 @@ func _build_payout_display():
 	var symbol_payouts = GameConfig.symbol_payouts
 	var symbols = GameConfig.symbols
 
+	# Cache payouts for sort comparator (avoids capturing in lambda)
+	_sort_payouts = symbol_payouts
+
 	# Sort symbols by their 3-match payout value (highest first)
 	var sorted_symbols = symbols.keys()
-	sorted_symbols.sort_custom(func(a, b):
-		var payout_a = _get_base_payout(a, symbol_payouts)
-		var payout_b = _get_base_payout(b, symbol_payouts)
-		return payout_a > payout_b
-	)
+	sorted_symbols.sort_custom(_compare_symbols_by_payout)
 
 	# Create entry for each symbol
 	for symbol_name in sorted_symbols:
 		var entry = _create_payout_entry(symbol_name, symbol_payouts)
 		if entry:
 			payout_container.add_child(entry)
+
+# Named comparator function for symbol sorting (more efficient than lambda)
+func _compare_symbols_by_payout(a: String, b: String) -> bool:
+	var payout_a = _get_base_payout(a, _sort_payouts)
+	var payout_b = _get_base_payout(b, _sort_payouts)
+	return payout_a > payout_b
 
 func _get_base_payout(symbol: String, payouts: Dictionary) -> int:
 	if payouts.has(symbol) and payouts[symbol].has("3"):

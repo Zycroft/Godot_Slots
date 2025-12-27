@@ -124,16 +124,15 @@ func _apply_card_effect(card) -> void:
 
 # Tick all active cards (called at day start)
 func _tick_active_cards() -> void:
-	var expired_cards: Array = []
-
-	for card in active_cards:
+	# Collect indices of expired cards (iterate backwards for safe removal)
+	var i = active_cards.size() - 1
+	while i >= 0:
+		var card = active_cards[i]
 		if not card.tick_day():
-			expired_cards.append(card)
-
-	# Remove expired cards
-	for card in expired_cards:
-		active_cards.erase(card)
-		card_expired.emit(card)
+			# Remove by index (O(1) for last element, O(n) for others but avoids search)
+			active_cards.remove_at(i)
+			card_expired.emit(card)
+		i -= 1
 
 # Recalculate all bonuses from active cards
 func _recalculate_bonuses() -> void:

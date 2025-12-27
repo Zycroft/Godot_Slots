@@ -132,19 +132,25 @@ const CARD_DEFINITIONS = {
 # Cached textures
 var _symbol_textures: Dictionary = {}
 
+# Flag to suppress signals during initialization/reset
+var _suppress_signals: bool = false
+
 func _ready():
 	# Initialize currency manager
 	currency_manager = CurrencyManagerClass.new()
+	assert(currency_manager != null, "CurrencyManager failed to initialize")
 	currency_manager.currency_changed.connect(_on_currency_changed)
 
 	# Initialize day manager
 	day_manager = DayManagerClass.new()
+	assert(day_manager != null, "DayManager failed to initialize")
 	day_manager.day_started.connect(_on_day_started)
 	day_manager.day_ended.connect(_on_day_ended)
 	day_manager.marker_updated.connect(_on_marker_updated)
 
 	# Initialize loyalty shop manager
 	shop_manager = LoyaltyShopManagerClass.new()
+	assert(shop_manager != null, "LoyaltyShopManager failed to initialize")
 	shop_manager.shop_opened.connect(_on_shop_opened)
 	shop_manager.shop_closed.connect(_on_shop_closed)
 	shop_manager.card_activated.connect(_on_loyalty_card_activated)
@@ -330,18 +336,22 @@ func start_game(difficulty: String) -> void:
 
 	current_difficulty = difficulty
 	var diff = DIFFICULTIES[difficulty]
-	credits = diff["credits"]
+	var starting_credits = diff["credits"]
 	hours_remaining = diff["hours"]
 	card_cost_multiplier = diff["card_cost_multiplier"]
 	owned_cards.clear()
 	game_started = true
 
+	# Suppress signals during reset to prevent race conditions
+	_suppress_signals = true
+
 	# Initialize currency with starting credits
-	var starting_credits = credits  # Save before reset overwrites it
 	if currency_manager:
 		currency_manager.reset_all()
 		currency_manager.add_currency(CurrencyManagerClass.CurrencyType.CASINO_COINS, starting_credits)
-		credits = starting_credits  # Restore after signal handler set it to 0
+
+	# Sync legacy credits
+	credits = starting_credits
 
 	# Start day 1
 	if day_manager:
@@ -349,6 +359,8 @@ func start_game(difficulty: String) -> void:
 		day_manager.start_day(1)
 		hours_remaining = day_manager.hours_remaining
 
+	# Re-enable signals and emit config changed
+	_suppress_signals = false
 	config_changed.emit()
 
 func get_card_cost(card_id: String) -> int:
@@ -378,6 +390,13 @@ func get_card_count(card_id: String) -> int:
 
 # Currency system methods
 func _on_currency_changed(currency_type: String, new_amount: int) -> void:
+	# Skip signal forwarding during initialization/reset to prevent race conditions
+	if _suppress_signals:
+		# Still sync credits silently
+		if currency_type == "casino_coins":
+			credits = new_amount
+		return
+
 	currency_changed.emit(currency_type, new_amount)
 	# Keep legacy credits in sync with casino_coins
 	if currency_type == "casino_coins":

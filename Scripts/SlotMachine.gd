@@ -50,6 +50,14 @@ var final_symbols: Array = []
 var lever_start_pos: Vector2
 var is_lever_pulling: bool = false
 
+# Tween management (store to cancel before creating new)
+var flame_tween: Tween
+var lever_tween: Tween
+var coin_timers: Array[SceneTreeTimer] = []
+
+# UI update optimization - dirty flag to batch updates
+var _ui_needs_update: bool = false
+
 # Free spin state
 var free_spins_remaining: int = 0
 
@@ -117,6 +125,21 @@ func _ready():
 	# Create currency HUD and converter
 	_create_currency_ui()
 
+func _exit_tree():
+	# Disconnect signals to prevent memory leaks
+	if GameConfig.config_changed.is_connected(_on_config_changed):
+		GameConfig.config_changed.disconnect(_on_config_changed)
+	if GameConfig.card_purchased.is_connected(_on_card_purchased):
+		GameConfig.card_purchased.disconnect(_on_card_purchased)
+	if GameConfig.currency_changed.is_connected(_on_currency_value_changed):
+		GameConfig.currency_changed.disconnect(_on_currency_value_changed)
+
+	# Kill any active tweens
+	if flame_tween and flame_tween.is_valid():
+		flame_tween.kill()
+	if lever_tween and lever_tween.is_valid():
+		lever_tween.kill()
+
 func _on_config_changed():
 	# Rebuild reels when config changes (only if not spinning)
 	if not is_spinning:
@@ -152,6 +175,7 @@ func _rebuild_reels():
 	reel_background.offset_right = (total_width / 2) + padding_h
 	reel_background.offset_top = -(reel_height / 2) - padding_v
 	reel_background.offset_bottom = (reel_height / 2) + padding_v
+
 
 	# Update lever position (just right of reel background)
 	lever.offset_left = (total_width / 2) + padding_h - 15
@@ -534,9 +558,7 @@ func _on_spin_pressed():
 		var can_continue = GameConfig.use_time(GameConfig.hours_per_spin)
 		if not can_continue:
 			# Day ended - the DayEndScreen will show via signal
-			_update_credits_display()
-			_update_hud()
-			_update_currency_hud()
+			_update_all_displays()
 			return
 	else:
 		if is_spinning:
@@ -544,9 +566,7 @@ func _on_spin_pressed():
 		free_spins_remaining -= 1
 		print("Free spin used! %d remaining" % free_spins_remaining)
 
-	_update_credits_display()
-	_update_hud()
-	_update_currency_hud()
+	_update_all_displays()
 
 	is_spinning = true
 	spin_time = 0.0
@@ -585,9 +605,7 @@ func _stop_spin():
 	# Award winnings
 	if total_payout > 0:
 		GameConfig.add_casino_coins(total_payout)
-		_update_credits_display()
-		_update_hud()
-		_update_currency_hud()
+		_update_all_displays()
 
 		# Play win effects
 		_play_flame_effect()
@@ -644,19 +662,26 @@ func _play_flame_effect():
 	# Play fire crackle sound
 	sfx_fire_crackle.play()
 
-	# Animate through 56 frames (8 columns x 7 rows)
-	var tween = create_tween()
-	for i in range(56):
-		tween.tween_property(flame_effect, "frame", i, 0.06)
+	# Kill previous flame tween if still running
+	if flame_tween and flame_tween.is_valid():
+		flame_tween.kill()
+
+	# Animate through 56 frames using tween_method (more efficient than 56 property tweens)
+	flame_tween = create_tween()
+	flame_tween.tween_method(_set_flame_frame, 0, 55, 56 * 0.06)
 
 	# Fade out at the end
-	tween.tween_property(flame_effect, "modulate:a", 0.0, 1.2)
-	tween.parallel().tween_property(sfx_fire_crackle, "volume_db", -40.0, 1.2)
-	tween.tween_callback(func():
-		flame_effect.visible = false
-		sfx_fire_crackle.stop()
-		sfx_fire_crackle.volume_db = 0.0
-	)
+	flame_tween.tween_property(flame_effect, "modulate:a", 0.0, 1.2)
+	flame_tween.parallel().tween_property(sfx_fire_crackle, "volume_db", -40.0, 1.2)
+	flame_tween.tween_callback(_on_flame_effect_complete)
+
+func _set_flame_frame(frame_value: float) -> void:
+	flame_effect.frame = int(frame_value)
+
+func _on_flame_effect_complete() -> void:
+	flame_effect.visible = false
+	sfx_fire_crackle.stop()
+	sfx_fire_crackle.volume_db = 0.0
 
 func _update_credits_display():
 	credits_label.text = "Credits: " + str(GameConfig.credits)
@@ -664,6 +689,17 @@ func _update_credits_display():
 func _update_hud():
 	amount_label.text = "$" + str(GameConfig.credits)
 	due_label.text = str(int(GameConfig.hours_remaining))
+
+# Combined UI update to avoid redundant calls
+func _update_all_displays():
+	_update_credits_display()
+	_update_hud()
+	_update_currency_hud()
+	_ui_needs_update = false
+
+# Mark UI as needing update (for deferred batching)
+func _mark_ui_dirty():
+	_ui_needs_update = true
 
 func _on_lever_clicked():
 	if not GameConfig.game_started:
@@ -676,16 +712,20 @@ func _on_lever_clicked():
 	is_lever_pulling = true
 	lever_button.disabled = true
 
-	var tween = create_tween()
-	tween.tween_property(lever_sprite, "frame", 1, 0.05)
-	tween.tween_property(lever_sprite, "frame", 2, 0.05)
-	tween.tween_property(lever_sprite, "frame", 3, 0.05)
-	tween.tween_callback(_start_spin_from_lever)
-	tween.tween_interval(0.1)
-	tween.tween_property(lever_sprite, "frame", 2, 0.06)
-	tween.tween_property(lever_sprite, "frame", 1, 0.06)
-	tween.tween_property(lever_sprite, "frame", 0, 0.06)
-	tween.tween_callback(_on_lever_reset)
+	# Kill previous lever tween if still running
+	if lever_tween and lever_tween.is_valid():
+		lever_tween.kill()
+
+	lever_tween = create_tween()
+	lever_tween.tween_property(lever_sprite, "frame", 1, 0.05)
+	lever_tween.tween_property(lever_sprite, "frame", 2, 0.05)
+	lever_tween.tween_property(lever_sprite, "frame", 3, 0.05)
+	lever_tween.tween_callback(_start_spin_from_lever)
+	lever_tween.tween_interval(0.1)
+	lever_tween.tween_property(lever_sprite, "frame", 2, 0.06)
+	lever_tween.tween_property(lever_sprite, "frame", 1, 0.06)
+	lever_tween.tween_property(lever_sprite, "frame", 0, 0.06)
+	lever_tween.tween_callback(_on_lever_reset)
 
 func _start_spin_from_lever():
 	_on_spin_pressed()
